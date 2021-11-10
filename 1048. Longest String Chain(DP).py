@@ -28,26 +28,10 @@ class Solution:
                     #temp = -float('inf')
                     if len(words[y]) - len(words[x]) == 1:
                         for k in range(len(words[y])):
-                            if words[y][k] not in words[x]:
-                                #print(words[y][k],words[x],words[y])
-                                tss = words[y]
-                                #print(tss)
-                                tss = tss.replace(words[y][k],"")
-                                #print(tss)
-                                if words[x] == tss:
-                                    #print("hi")
-                                    new_dp = 1 + dp[y]
-                                    temp = max(temp,new_dp,1)
-                                    
-                            elif words[y].count(words[y][k]) > words[x].count(words[y][k]):
-                                check = []
-                                for m in range(len(words[y])):
-                                    if words[y][m] == words[y][k]:
-                                        check.append(words[y][0:m]+words[y][m+1:len(words[y])])
-                                        
-                                if words[x] in check:
-                                    new_dp = 1 + dp[y]
-                                    temp = max(temp,new_dp,1)
+                            if words[x] == words[y][0:k]+words[y][k+1:len(words[y])]:
+                                new_dp = 1 + dp[y]
+                                temp = max(temp,new_dp,1)
+                            
                                     
                     
                         
