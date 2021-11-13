@@ -23,4 +23,4 @@ class Solution:
         
         
 ##Dynamic Programming (Approach 1)
-## explanation : ()
+## explanation : (https://github.com/midnightbot/leetcode_solutions/blob/main/55.%20Jump%20Game.pdf)
