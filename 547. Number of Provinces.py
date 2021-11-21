@@ -1,3 +1,5 @@
+##SS
+## Use set to avoid adding same nodes into the explore queue 
 class Solution:
     def findCircleNum(self, isConnected: List[List[int]]) -> int:
         
