@@ -1,4 +1,8 @@
 ##ss
+
+##at every step I am storing the whole next level nodes in the queue
+##so when in start the while loop
+##I start pointing that nodes to its right nodes, then I find the new level below it
 """
 # Definition for a Node.
 class Node:
