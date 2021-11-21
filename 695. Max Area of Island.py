@@ -3,7 +3,7 @@ class Solution:
     def maxAreaOfIsland(self, grid: List[List[int]]) -> int:
         
         ans = 0
-        alls = []
+        
         
         for x in range(len(grid)):
             for y in range(len(grid[0])):
