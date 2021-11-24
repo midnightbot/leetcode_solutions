@@ -37,7 +37,7 @@ class Solution:
             num[x]*= (denos//deno[x])
             
         #print(num,deno)   
-        numerator = sum(num) ## final numerator is sum of all numerators as all numerators all multiplied by common denominator and the string is split on + sign hence add num array
+        numerator = sum(num) ## final numerator is sum of all numerators as all numerators are multiplied by common denominator and the string is split on + sign hence add num array
         ##deno is the common denomintor
         ##now answer is found, just reduce it to lowest form
         
