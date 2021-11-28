@@ -29,4 +29,20 @@ class Solution:
             dp[x] = mins
                 
         return dp[len(dp)-1]
+## Solution 2
+## Both Solution 1 and Solution 2 are conceptually same but use of cache makes it fast
+class Solution:
+    def minDays(self, n: int) -> int:
+        a = self.cal_dp(n)
+        return a
+        
+    @lru_cache(None)
+    def cal_dp(self,n):
+        if n == 0:
+            return 0
+        elif n == 1:
+            return 1
+        
+        else:
+            return min(1+self.cal_dp(n//2)+n%2,1+self.cal_dp(n//3)+n%3)
         
