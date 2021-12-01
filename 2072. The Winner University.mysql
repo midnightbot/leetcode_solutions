@@ -1,0 +1,10 @@
+# Write your MySQL query statement below
+with count1 as (select count(student_id) c1 from NewYork where score>=90),
+
+count2 as (select count(student_id) c2 from California where score>=90)
+
+Select 
+Case when count1.c1> count2.c2 then 'New York University'
+when count2.c2 > count1.c1 then 'California University'
+when count1.c1 = count2.c2 then 'No Winner' end as winner
+from count1, count2
