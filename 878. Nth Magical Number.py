@@ -7,7 +7,8 @@ class Solution:
         ## number of numbers divisible by a till m is m//a
         ## number of numbers divisible by b till m is m//b
         ##number of numbers divisible by both a&b till m  is m//lcm(a,b)
- 
+        
+        ##therefore nth number will be n = m//a + m//b - m///lcm(a,b)
         lcm = a*b/math.gcd(a,b)
         
         left = 0
@@ -27,6 +28,21 @@ class Solution:
                 right = mid
                 
         return left%(pow(10,9)+7)
+                
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
                 
         
         
