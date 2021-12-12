@@ -29,4 +29,4 @@ class Solution:
         return dp[num_people]%(pow(10,9)+7)
         
         
-        
+##pdf explanation uploaded
