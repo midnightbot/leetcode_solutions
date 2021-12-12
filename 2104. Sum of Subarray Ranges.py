@@ -1,4 +1,5 @@
 ##ss
+##Solution 1 (Using Recursion)
 class Solution:
     def subArrayRanges(self, nums: List[int]) -> int:
         
@@ -17,4 +18,22 @@ class Solution:
             self.combinations([],-1,mins,maxs,ans,temp)
     
     
+        
+## Solution 2
+class Solution:
+    def subArrayRanges(self, nums: List[int]) -> int:
+        
+        ans = 0
+        
+        for x in range(len(nums)):
+            mins = nums[x]
+            maxs = nums[x]
+            for y in range(x,len(nums)):
+                mins = min(mins, nums[y])
+                maxs = max(maxs,nums[y])
+                
+                ans+=(maxs-mins)
+                
+        return ans
+                
         
