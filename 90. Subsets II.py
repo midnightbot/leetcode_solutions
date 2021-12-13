@@ -12,7 +12,7 @@ class Solution:
     def create(self,nums,i,ans,tset,check):
         
         if len(nums) == 0 or i > len(nums) -1:
-            if self.mask(tset) not in check:
+            if self.mask(tset) not in check: ##check if no combination of this set is already present in the ans
                 ans.add(tuple((tset)))
                 check.append(self.mask(tset))
             
@@ -30,7 +30,8 @@ class Solution:
             self.create([],i+1,ans,new_set,check)
             
         
-    def mask(self,arr):
+    def mask(self,arr): ## create freq map of every answer, so that no combination of this is added again in ans
+        ##eg if [1,2,1] in answer then we have to avoid [1,1,2]
         dicts = {}
         arr = sorted(arr)
         for x in range(len(arr)):
