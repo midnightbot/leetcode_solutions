@@ -20,6 +20,10 @@ class Solution:
         self.form_words(n-1,"u",ans,memo) ##starting char can either be u
         
         t1 = memo[("e",n-1)]+memo[("a",n-1)] + memo[("i",n-1)] + memo[("o",n-1)] + memo[("u",n-1)]
+        
+        ##OR
+        #t2 = memo[("e",n-2)] + (memo[("a",n-2)] + memo[("i",n-2)])  + (memo[("a",n-2)] + memo[("e",n-2)] + memo[("o",n-2)] + memo[("u",n-2)]) + (memo[("i",n-2)] + memo[("u",n-2)]) + (memo[("a",n-2)])
+        #print(t1==t2)
         #print(ans)
         ##ans contains all the combinations
         return t1%(pow(10,9)+7)
