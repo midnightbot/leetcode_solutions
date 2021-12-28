@@ -91,5 +91,71 @@ class Solution:
                         
                         
                         
+                        
+##Solution 2
+## DP + Memoizartion + exhausting use of one sticker first and then not seeing it again
+class Solution:
+    def minStickers(self, stickers: List[str], target: str) -> int:
+        
+        upd_stickers = []
+        for x in range(len(stickers)):
+            upd_stickers.append(self.make_mask(stickers[x]))
+            
+            
+        #print(upd_stickers)
+        memo = {}
+        ans = self.find_ans(target,{},memo,upd_stickers)
+        if ans == float('inf'):
+            ans = -1
+            
+        return ans
+        
+    def find_ans(self,target,thissticker,memo,stickers):
+        
+        if target in memo.keys():
+            return memo[target]
+        
+        if thissticker:
+            ans = 1
+            
+        else:
+            ans = 0
+            
+        new_target = ""
+        for x in target:
+            if x in thissticker and thissticker[x] >0:
+                thissticker[x]-=1
+                
+            else:
+                new_target+=x
+                
+        if len(new_target)!=0:
+            used = float('inf')
+            
+            for x in stickers:
+                if new_target[0] not in x:
+                    continue
+                    
+                used = min(used,self.find_ans(new_target,copy.deepcopy(x),memo,stickers))
+                
+            memo[new_target] = used
+            ans+=used
+        
+        return ans
+                
+        
+    def make_mask(self,sticker):
+        
+        ans = {}
+        for x in range(len(sticker)):
+            if sticker[x] in ans.keys():
+                ans[sticker[x]]+=1
+                
+            else:
+                ans[sticker[x]] = 1
+                
+                
+        return ans
+        
                     
         
