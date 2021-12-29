@@ -38,3 +38,24 @@ class Solution:
             memo[(curr,fuel)] = ways % (pow(10,9)+7)
             return memo[(curr,fuel)]
         
+        
+## Solution 2 (Recursion without memoization) (Time Limit Exceeded)
+class Solution:
+    def countRoutes(self, locations: List[int], start: int, finish: int, fuel: int) -> int:
+        
+        final = set()
+        ans = []
+        self.expand(locations,start,finish,fuel,ans,final)
+        return len(final)%(pow(10,9)+7)
+    def expand(self,locations,curr,finish,fuel,ans,final):
+        
+        if fuel>=0:
+            if curr == finish:
+                final.add(tuple(ans))
+                
+            for x in range(len(locations)):
+                if x!=curr and fuel - abs(locations[x]-locations[curr]) >=0:
+                    ans.append(x)
+                    self.expand(locations,x,finish,fuel-abs(locations[x]-locations[curr]),ans,final)
+                    ans.pop(len(ans)-1)
+        
