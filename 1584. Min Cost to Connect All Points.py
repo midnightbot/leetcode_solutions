@@ -45,3 +45,59 @@ class Solution:
        
         
         
+## Solution 2 (Kruskals using Union Find)
+import queue
+class Solution:
+    def minCostConnectPoints(self, points: List[List[int]]) -> int:
+        
+        ##using union find and kruskals algorithm
+        n = len(points)
+        if len(points) == 1:
+            return 0
+        visited = set()
+        all_edges = []
+        #prio = queue.PriorityQueue()
+        ans = set()
+        for x in range(len(points)-1):
+            for y in range(x+1,len(points)):
+                
+                dist = abs(points[x][0]-points[y][0]) + abs(points[x][1] - points[y][1])
+                all_edges.append((dist,x,y))
+                #prio.put((dist,x,y))
+                
+        all_edges = sorted(all_edges)
+             
+        #print(all_edges,prio.queue)
+        #print(all_edges.queue)
+        self.roots = [x for x in range(n)]
+        ans = 0
+        for x in all_edges:
+            if self.union(x[1],x[2]):
+                #print(x[0],x[1],x[2])
+                ans+=x[0]
+                
+        return ans
+        
+        
+    def find(self,v): ##returns which group does an eleemnt belong to
+        if self.roots[v]!=v:
+            self.roots[v] = self.find(self.roots[v])
+            
+        return self.roots[v]
+    
+    
+    def union(self,u,v): ## merges two groups
+        p1 = self.find(u)
+        p2 = self.find(v)
+        
+        if p1!=p2:
+            self.roots[p2] = self.roots[p1]
+            return True
+        
+        return False
+    
+    
+    
+    
+    
+        
