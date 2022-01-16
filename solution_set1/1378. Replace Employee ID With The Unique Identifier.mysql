@@ -1,0 +1,5 @@
+##ss
+# Write your MySQL query statement below
+Select btable.unique_id,atable.name
+from Employees atable left join  EmployeeUNI btable
+on atable.id=btable.id
