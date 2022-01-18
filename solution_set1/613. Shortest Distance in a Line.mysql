@@ -1,0 +1,5 @@
+##ss
+# Write your MySQL query statement below
+Select MIN(ABS(t1.x - t2.x)) as shortest
+from Point t1 cross join Point t2
+where t1.x!=t2.x
