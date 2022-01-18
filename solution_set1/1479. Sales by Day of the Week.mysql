@@ -1,0 +1,14 @@
+# Write your MySQL query statement below
+Select a.item_category as CATEGORY,
+sum(case when DAYOFWEEK(b.order_date) = 2 then quantity else 0 end) as MONDAY,
+sum(case when DAYOFWEEK(b.order_date) = 3 then quantity else 0 end) as TUESDAY,
+sum(case when DAYOFWEEK(b.order_date) = 4 then quantity else 0 end) as WEDNESDAY,
+sum(case when DAYOFWEEK(b.order_date) = 5 then quantity else 0 end) as THURSDAY,
+sum(case when DAYOFWEEK(b.order_date) = 6 then quantity else 0 end) as FRIDAY,
+sum(case when DAYOFWEEK(b.order_date) = 7  then quantity else 0 end) as SATURDAY,
+sum(case when DAYOFWEEK(b.order_date) = 1 then quantity else 0 end) as SUNDAY
+
+from Items as a left join Orders as b
+on a.item_id = b.item_id
+group by a.item_category
+order by a.item_category;
