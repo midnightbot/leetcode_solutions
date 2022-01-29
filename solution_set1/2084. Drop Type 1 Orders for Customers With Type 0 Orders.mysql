@@ -1,0 +1,3 @@
+Select * from Orders
+where (customer_id,order_type)
+in (Select customer_id,min(order_type) from Orders group by customer_id)
