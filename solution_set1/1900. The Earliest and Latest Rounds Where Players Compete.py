@@ -68,3 +68,39 @@ class Solution:
         
         
         
+##Solution 2
+##same as Solution1, minor change instead of checking all 2^n options, put 1's on place of firstPlayer and secondPlayer and check for 2^(n-2) combinations as,
+##if we do not have either of them in the next round, we will terminate it
+class Solution:
+    def earliestAndLatest(self, n: int, firstPlayer: int, secondPlayer: int) -> List[int]:
+        
+        ans = set()
+        def play(players,rounds):
+            
+            if len(players) < 2:
+                return 
+            
+            else:
+                pairs = []
+                for x in range(len(players)//2):
+                    a = players[x]
+                    b = players[-1-x]
+                    
+                    if a == firstPlayer and b == secondPlayer:
+                        ans.add(rounds)
+                        return 
+                    
+                    elif a!=firstPlayer and b!=secondPlayer and a!=secondPlayer and b!=firstPlayer:
+                        pairs.append([a,b])
+                        
+                extra = [firstPlayer,secondPlayer]
+                if len(players)%2!=0:
+                    extra.append(players[len(players)//2])
+                extra = tuple(set(extra))
+                for nxt in product(*pairs):
+                    play(sorted(nxt+tuple(extra)),rounds+1)
+                    
+        play([(x+1) for x in range(n)],1)
+        return [min(ans),max(ans)]
+                        
+        
