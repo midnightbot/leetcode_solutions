@@ -1,0 +1,6 @@
+##ss
+# Write your MySQL query statement below
+Select e.employee_id,e.department_id
+from Employee e
+where e.employee_id in (select e.employee_id from Employee e group by e.employee_id having count(e.employee_id) = 1) or e.primary_flag = 'Y'
+order by e.employee_id
