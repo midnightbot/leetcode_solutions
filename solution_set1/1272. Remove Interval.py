@@ -31,12 +31,14 @@ class Solution:
                 remove = [interval[1],remove[1]]
                 return None,None
             
+            ##interval is bigger than full of remove interval
             elif remove[0] > interval[0] and remove[1] < interval[1] and (interval[0] < remove[0] < interval[1]):
                 
                 cal1,cal2 =  [interval[0],remove[0]] , [remove[1],interval[1]]
                 remove = [-float('inf'),-float('inf')]
                 return cal1,cal2
             
+            ##no intersection between the two arrays
             else:
                 return interval,None
             
