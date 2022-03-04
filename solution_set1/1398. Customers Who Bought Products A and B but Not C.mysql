@@ -1,0 +1,15 @@
+##ss
+# Write your MySQL query statement below
+Select c.customer_id, c.customer_name
+from Customers c
+where c.customer_id in (Select o.customer_id 
+                      from Orders o
+                      where o.product_name = 'A')
+                      
+    and c.customer_id in (Select o.customer_id 
+                      from Orders o
+                      where o.product_name = 'B')
+                      
+    and c.customer_id not in (Select o.customer_id 
+                      from Orders o
+                      where o.product_name = 'C')
