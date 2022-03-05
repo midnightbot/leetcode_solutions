@@ -2,7 +2,7 @@
 class Solution:
     def minMovesToMakePalindrome(self, s: str) -> int:
         
-        ##either it will be swapped or not be swapped
+        ##idea is to match first and last char with min swaps and reduce the string to s[1:-1] and solve it recursively
         
         self.ans = float('inf')
         
