@@ -4,7 +4,7 @@ class Solution:
         
         ##answers = no of groups
         ##count extra edges
-        ## if extra cables > no of groups return -1
+        ## if extra cables < no of groups return -1
         
         parent = [-1 for x in range(n)]
         count = {'groups':n, 'extra':0}
