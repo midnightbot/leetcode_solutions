@@ -1,0 +1,9 @@
+##ss
+# Write your MySQL query statement below
+Select company_id, employee_id, employee_name, round(case
+when max(salary) over(partition by company_id ) < 1000 then salary
+when max(salary) over(partition by company_id ) between 1000 and 10000 then salary*0.76
+when max(salary) over(partition by company_id ) > 10000 then salary*0.51
+end,0) salary
+
+from Salaries
