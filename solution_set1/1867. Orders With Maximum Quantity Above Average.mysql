@@ -1,0 +1,13 @@
+##
+# Write your MySQL query statement below
+## maximum qunatity > avg quantity
+## max quantity => max quantity of any product in the order
+
+with temp as (
+Select order_id,
+max(quantity) as mxs,
+avg(quantity) as avgs
+from OrdersDetails
+group by order_id)
+
+Select order_id from temp where mxs > (Select max(avgs) from temp)
