@@ -1,0 +1,11 @@
+##ss
+# Write your MySQL query statement below
+with temp as (
+Select a.machine_id, (a.timestamp - b.timestamp) as diffs
+from Activity a left join Activity b
+on a.machine_id = b.machine_id and a.process_id = b.process_id and a.activity_type = 'end' and b.activity_type = 'start'
+having diffs is not Null)
+
+Select machine_id, round(avg(diffs), 3) as processing_time
+from temp
+group by machine_id
