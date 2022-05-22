@@ -53,3 +53,47 @@ class Solution:
                         
                 
         return max_ans(','.join(['0' for x in range(n*2)]),1)
+
+    
+  ## Solution 2 (Same as above, just use bitmask instead of string)
+
+class Solution:
+    def maxScore(self, nums: List[int]) -> int:
+        
+        n = len(nums) // 2
+        
+        @lru_cache(None)
+        def findgcd(x,y):
+            return math.gcd(x,y)
+        
+        
+        @lru_cache(None)
+        def solve(left,i):
+            
+            if i == n + 1:##base case
+                return 0
+            
+            else:
+                ans = -1
+                
+                for x in range(2*n):
+                    if(left >> x) & 1:
+                        continue
+                        
+                    for y in range(x+1,2*n):
+                        if (left >> y) & 1:
+                            continue
+                            
+                        thisscore = i * findgcd(nums[x],nums[y]) + solve(left | (1 << x) | (1<<y),i+1)
+                        
+                        ans = max(ans, thisscore)
+                        
+                return ans
+            
+            
+            
+            
+            
+        return solve(0,1)
+            
+        
