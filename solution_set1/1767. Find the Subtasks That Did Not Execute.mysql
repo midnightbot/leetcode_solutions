@@ -1,0 +1,13 @@
+# Write your MySQL query statement below
+with recursive temp_table as (
+select task_id, subtasks_count as subtask_id 
+from tasks
+union all 
+    
+select task_id, subtask_id - 1 from temp_table
+where subtask_id > 1
+)
+
+select task_id,subtask_id
+from temp_table
+where (task_id,subtask_id) not in (select * from executed)
