@@ -1,0 +1,6 @@
+# Write your MySQL query statement below
+## fully ss
+Select w.city_id, w.day, w.degree
+from weather w 
+where w.degree = (select max(a.degree) from weather a where a.city_id = w.city_id ) and w.day = (select min(b.day) from weather b where b.city_id = w.city_id and b.degree = w.degree)
+order by w.city_id
