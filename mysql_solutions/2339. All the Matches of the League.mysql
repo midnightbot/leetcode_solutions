@@ -1,0 +1,4 @@
+# Write your MySQL query statement below
+Select a.team_name as home_team,b.team_name as away_team
+from Teams a join Teams b
+on a.team_name != b.team_name
