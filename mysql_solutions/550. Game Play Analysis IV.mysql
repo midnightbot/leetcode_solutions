@@ -1,0 +1,9 @@
+# Write your MySQL query statement below
+with temp as (select a.player_id, min(a.event_date) as start_date
+              from Activity a 
+              group by a.player_id),
+temp2 as (select a.player_id,a.start_date,b.event_date
+              from temp as a join Activity b
+              on a.player_id = b.player_id and DATEDIFF(a.start_date,b.event_date)=-1),
+denominator as (select count(distinct player_id) from Activity)
+select round((select count(player_id) from temp2)/(select * from denominator),2) as fraction
