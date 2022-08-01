@@ -1,0 +1,17 @@
+# Write your MySQL query statement below
+with temp as (select a.task_id, WEEKDAY(a.submit_date) as dy
+             from Tasks a),
+             
+temp2 as (Select b.task_id, b.dy,
+         case b.dy
+         when 0 then "weekday"
+         when 1 then "weekday"
+         when 2 then "weekday"
+         when 3 then "weekday"
+         when 4 then "weekday"
+         when 5 then "weekend"
+         when 6 then "weekend"
+         end as code
+         from temp b)
+
+select (select count(task_id) from temp2 where code="weekend") as weekend_cnt, (select count(task_id) from temp2 where code="weekday") as working_cnt
