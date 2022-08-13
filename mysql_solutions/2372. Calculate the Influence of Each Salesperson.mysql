@@ -1,0 +1,18 @@
+# Write your MySQL query statement below
+with tmp as(
+    select s.sale_id, s.customer_id, s.price, c.salesperson_id
+    from Sales s left join Customer c
+    on c.customer_id = s.customer_id
+),
+
+tmp1 as (
+    select t.salesperson_id, t.price, s1.name, s1.salesperson_id as snew
+    from tmp t right join Salesperson s1
+    on t.salesperson_id = s1.salesperson_id
+)
+
+select snew as salesperson_id,name,sum(ifnull(price,0)) as total
+from tmp1
+group by snew
+
+
