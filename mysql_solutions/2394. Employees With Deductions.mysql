@@ -1,0 +1,24 @@
+## Solution 1 (Time Limit Exceeded)
+# Write your MySQL query statement below
+with temp as (
+select employee_id, sum(CEIL(TIMESTAMPDIFF(SECOND, in_time, out_time)/60)) as mins
+from Logs
+group by employee_id),
+
+temp2 as (
+select a.employee_id, a.needed_hours, b.mins
+from Employees a left join temp b
+on a.employee_id = b.employee_id)
+
+
+select employee_id
+from temp2
+where needed_hours*60 >= mins or mins is null
+
+## Solution 2 (Same as Solution 1)
+# Write your MySQL query statement below
+select e.employee_id
+from Employees e left join Logs l
+on e.employee_id = l.employee_id
+group by e.employee_id, e.needed_hours
+having(sum(ceil(ifnull(timestampdiff(second, l.in_time, l.out_time),0)/60))/60) < e.needed_hours
