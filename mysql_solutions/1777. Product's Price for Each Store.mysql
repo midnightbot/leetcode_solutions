@@ -1,0 +1,40 @@
+# Write your MySQL query statement below
+with temp as (
+    select product_id, price as store1
+    from products
+    where store = "store1"
+),
+temp2 as (select product_id, price as store2
+    from products
+    where store = "store2"),
+temp3 as (
+    select product_id, price as store3
+    from products
+    where store = "store3"
+),
+## full join (left join UNION right join)
+temp4 as (
+    select t1.product_id, t1.store1, t2.store2
+    from temp t1 left join temp2 t2 on
+    t1.product_id = t2.product_id
+    union
+    select t2.product_id, t1.store1, t2.store2
+    from temp t1 right join temp2 t2 on
+    t1.product_id = t2.product_id
+    
+),
+
+## full join (left join UNION right join)
+temp5 as (
+    select t1.product_id, t1.store1, t1.store2, t2.store3
+    from temp4 t1 left join temp3 t2 on
+    t1.product_id = t2.product_id
+    union
+    select t2.product_id, t1.store1, t1.store2, t2.store3
+    from temp4 t1 right join temp3 t2 on
+    t1.product_id = t2.product_id
+)
+
+select * from temp5
+
+
