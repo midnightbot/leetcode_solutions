@@ -1,0 +1,39 @@
+# Write your MySQL query statement below
+with temp as (
+    select o.customer_id,o.product_id,o.order_date,o.quantity,p.price
+    from orders o join product p
+    on o.product_id = p.product_id
+),
+
+temp2 as (
+    select t.customer_id, t.product_id, t.order_date,t.quantity * t.price as total
+    from temp t
+),
+
+temp3 as (
+    select t.*, c.name
+    from temp2 t join customers c
+    on t.customer_id = c.customer_id
+),
+june as (
+select customer_id, name, sum(total) as june_total
+from temp3
+where order_date >= '2020-06-01' and order_date <= '2020-06-30'
+group by customer_id
+), 
+
+july as (
+select customer_id, name, sum(total) as july_total
+from temp3
+where order_date >= '2020-07-01' and order_date <= '2020-07-31'
+group by customer_id
+),
+
+combine as (
+    select je.*, ju.july_total
+    from june je join july ju on je.customer_id = ju.customer_id
+)
+
+select customer_id, name
+from combine
+where june_total>=100 and july_total>=100
