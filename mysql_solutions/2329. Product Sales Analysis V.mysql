@@ -1,0 +1,17 @@
+# Write your MySQL query statement below
+
+with temp as (
+    select s.*, p.price
+    from sales s join product p
+    on s.product_id = p.product_id
+),
+
+temp2 as (
+    select t.*, t.quantity * t.price as spending
+    from temp t
+)
+
+select user_id, sum(spending) as spending
+from temp2
+group by user_id
+order by spending desc
