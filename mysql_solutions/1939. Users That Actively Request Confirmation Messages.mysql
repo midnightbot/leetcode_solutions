@@ -1,0 +1,6 @@
+# Write your MySQL query statement below
+#SELECT timestampdiff(second,'2021-06-12 11:57:29', '2021-06-13 11:57:30')
+
+select distinct(a.user_id)
+from confirmations a, confirmations b
+where a.user_id = b.user_id and timestampdiff(second,a.time_stamp, b.time_stamp)<=86400 and b.time_stamp > a.time_stamp
