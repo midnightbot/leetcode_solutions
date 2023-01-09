@@ -1,0 +1,7 @@
+# Write your MySQL query statement below
+with temp as (select from_id, to_id, if(from_id<to_id,from_id,to_id) as A, if(from_id<to_id,to_id,from_id) as B, duration
+from calls)
+
+select A as person1,B as person2, count(duration) as call_count,sum(duration) as total_duration
+from temp
+group by A,B
