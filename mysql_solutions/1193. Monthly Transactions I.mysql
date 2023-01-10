@@ -1,0 +1,31 @@
+# Write your MySQL query statement below
+with temp as (
+    select a.*, DATE_FORMAT(a.trans_date, '%Y-%m') as month
+    from Transactions a
+),
+
+temp0 as (
+    select a.*, DATE_FORMAT(a.trans_date, '%Y-%m') as month
+    from Transactions a
+    where state = "approved"
+),
+
+temp2 as (
+select t.*, count(id) as trans_count, sum(amount) as trans_total_amount
+from temp t
+group by country, month
+),
+
+temp3 as (
+select t.*, count(id) as approved_count, sum(amount) as approved_total_amount
+from temp0 t
+group by country, month
+),
+
+temp4 as (
+    select a.month, a.country, IFNULL(a.trans_count,0) as trans_count, IFNULL(b.approved_count,0) as approved_count, IFNULL(a.trans_total_amount,0) as trans_total_amount, IFNULL(b.approved_total_amount,0) as approved_total_amount
+    from temp2 a left join temp3 b
+    on a.month = b.month and a.country = b.country
+)
+
+select * from temp4
