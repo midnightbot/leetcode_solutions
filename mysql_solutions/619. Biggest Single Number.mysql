@@ -1,0 +1,14 @@
+# Write your MySQL query statement below
+with temp as(
+    select count(num) as counts, num
+    from MyNumbers
+    group by num
+),
+temp2 as (
+    select num
+    from temp
+    where counts = 1
+)
+
+select max(num) as num
+from temp2
