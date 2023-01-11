@@ -1,0 +1,17 @@
+# Write your MySQL query statement below
+with temp as(
+    select student_id, max(grade) as grade
+    from enrollments
+    group by student_id
+    order by student_id
+),
+temp2 as (
+    select a.student_id, a.grade, b.course_id
+    from temp a join enrollments b
+    on a.student_id = b.student_id and a.grade = b.grade
+)
+
+select student_id, min(course_id) as course_id, grade
+from temp2
+group by student_id
+order by student_id
