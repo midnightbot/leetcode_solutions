@@ -1,0 +1,29 @@
+# Write your MySQL query statement below
+with temp as (
+    select user2_id as tp
+    from friendship
+    where user1_id = 1
+),
+temp2 as (
+    select user1_id as tp
+    from friendship
+    where user2_id = 1
+),
+## finding friends of user = 1
+temp3 as (
+    select t1.*
+    from temp t1
+    union
+    select t2.*
+    from temp2 t2
+),
+## find all pages that his friends liked
+temp4 as (
+select page_id as recommended_page
+from likes
+where user_id in (select * from temp3))
+
+## finding all pages that his friends liked but he did not like
+select distinct(recommended_page)
+from temp4
+where recommended_page not in (select page_id from likes where user_id=1)
