@@ -1,0 +1,19 @@
+# Write your MySQL query statement below
+with temp as(select e.*, v.value as lval
+from expressions e join variables v
+on e.left_operand = v.name),
+
+temp2 as (
+    select t.*, v.value as rval
+    from temp t join variables v
+    on t.right_operand = v.name
+),
+
+temp3 as (select t.*, case when operator = '>' then lval > rval
+when operator = '<' then lval < rval
+else lval = rval
+end as tp
+from temp2 t)
+
+select t.left_operand, t.operator,t.right_operand,replace(replace(tp,1,'true'), 0 , 'false') as value
+from temp3 t
