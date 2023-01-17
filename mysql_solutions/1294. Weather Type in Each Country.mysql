@@ -1,0 +1,30 @@
+# Write your MySQL query statement below
+with temp as (
+    select w.country_id, w.weather_state as cols, w.day
+    from weather w
+    where month(w.day) = 11 and year(w.day) = 2019
+),
+
+temp2 as (
+    select t.country_id, avg(cols) as avg
+    from temp t
+    group by t.country_id
+),
+
+temp3 as (
+    select t.country_id, t.avg, b.country_name
+    from temp2 t join countries b
+    on t.country_id = b.country_id
+),
+
+temp4 as (
+    select t.*, case
+    when t.avg<=15 then 'Cold'
+    when t.avg >=25 then 'Hot'
+    else 'Warm'
+    end as weather_type
+    from temp3 t
+)
+
+select temp4.country_name,temp4.weather_type
+from temp4
