@@ -1,0 +1,14 @@
+# Write your MySQL query statement below
+with temp as (
+    select count(id) as cnt, managerId
+    from employee
+    group by managerId
+),
+temp2 as(
+    select managerId
+    from temp
+    where cnt >=5
+)
+select name
+from employee
+where id in (select * from temp2)
