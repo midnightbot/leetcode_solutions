@@ -1,0 +1,21 @@
+# Write your MySQL query statement below
+with temp as(
+    select student_id, subject_name, count(subject_name) as attended_exams
+    from examinations
+    group by student_id, subject_name
+),
+ff as (
+    select st.*, su.*
+    from students st, subjects su
+    order by st.student_id, su.subject_name
+),
+
+ans as (
+    select f.student_id, f.student_name, f.subject_name, t.attended_exams
+    from ff f left join temp t
+    on f.student_id = t.student_id and f.subject_name = t.subject_name
+)
+
+select student_id, student_name,subject_name, IFNULL(attended_exams,0) as attended_exams
+from ans
+order by student_id, subject_name
