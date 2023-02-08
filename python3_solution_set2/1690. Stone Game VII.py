@@ -14,7 +14,9 @@ class Solution:
             else:
                 ##alice takes f (i,j) -> (i+1,j)
                 ##bob takes f (i+1,j) -> (i+2,j)
-                ### 
+                ### in this case diff btn alice and bob will be
+                ## sum(arr[i+1,j]) - sum(arr[i+2,j]) = arr[i+1]
+                ## diff btn alice and bob will always be the number bob picks as he is playing after alice
                 if i+1 < n:
                     a = stones[i+1] + find_ans(i+2,j)
                 else:
