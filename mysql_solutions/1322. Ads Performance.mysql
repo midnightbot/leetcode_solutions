@@ -1,0 +1,44 @@
+# Write your MySQL query statement below
+with temp as(
+    select ad_id, count(user_id) as click
+    from Ads 
+    where action = "Clicked"
+    group by ad_id
+),
+
+temp2 as(
+    select ad_id, count(user_id) as viewed
+    from Ads 
+    where action = "Viewed"
+    group by ad_id
+),
+
+temp3 as (
+    select distinct(ad_id) id
+    from ads
+),
+
+temp4 as (
+    select t3.id,COALESCE(t.click,0) as click
+    from temp3 t3 left join temp t
+    on t3.id = t.ad_id
+),
+
+temp5 as(
+    select t4.*, COALESCE(t2.viewed,0) as viewed
+    from temp4 t4 left join temp2 t2
+    on t4.id = t2.ad_id
+),
+temp6 as(
+select id, round((click/(click+viewed))*100,2) as ctr
+from temp5
+where click!=0
+),
+temp7 as(
+    select t3.id as ad_id, COALESCE(t6.ctr,0) as ctr
+    from temp3 t3 left join temp6 t6
+    on t3.id = t6.id
+)
+select * 
+from temp7
+order by ctr desc, ad_id asc
