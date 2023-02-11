@@ -1,0 +1,14 @@
+# Write your MySQL query statement below
+with temp as(
+    select project_id, count(project_id) as cnt
+    from project
+    group by project_id
+),
+temp2 as (
+    select max(cnt)
+    from temp
+)
+
+select project_id
+from temp
+where cnt in (select * from temp2)
