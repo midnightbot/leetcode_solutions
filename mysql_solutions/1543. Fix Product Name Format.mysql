@@ -1,0 +1,10 @@
+# Write your MySQL query statement below
+with temp as(
+    select sale_id, lower(trim(product_name)) as product_name, date_format(sale_date, '%Y-%m') as sale_date
+    from sales
+)
+
+select product_name, sale_date, count(sale_date) as total
+from temp
+group by product_name, sale_date
+order by product_name asc, sale_date asc
