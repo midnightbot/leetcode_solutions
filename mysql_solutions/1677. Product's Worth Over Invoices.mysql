@@ -1,0 +1,15 @@
+# Write your MySQL query statement below
+with temp as(
+    select product_id, sum(rest) as rest, sum(paid) as paid, sum(canceled) as canceled, sum(refunded) as refunded
+    from invoice
+    group by product_id
+),
+temp2 as(
+    select COALESCE(t.product_id,0) as product_id, COALESCE(t.rest,0) as rest, COALESCE(t.paid,0) as paid, COALESCE(t.canceled,0) as canceled, COALESCE(t.refunded,0) as refunded ,p.name as name
+    from product p left join temp t 
+    on p.product_id = t.product_id
+)
+
+select name, rest, paid, canceled, refunded
+from temp2
+order by name
