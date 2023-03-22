@@ -1,0 +1,9 @@
+# Write your MySQL query statement below
+with temp as(
+    select t.program_date, t.content_id, c.title, c.Kids_content, c.content_type
+    from TvProgram t join Content c
+    on t.content_id = c.content_id
+)
+
+select distinct(title) from temp
+where year(program_date) = '2020' and month(program_date) = '6' and Kids_content = 'Y' and content_type = 'Movies'
