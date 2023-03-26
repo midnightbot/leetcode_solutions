@@ -1,0 +1,13 @@
+# Write your MySQL query statement below
+with temp as(
+    select a.x,a.y,b.x as x1,b.y as y1, sqrt(power(a.x-b.x,2) + power(a.y-b.y,2)) as dist
+    from point2d a cross join point2d b
+),
+temp2 as (
+    select dist
+    from temp
+    where dist!=0
+)
+
+select round(min(dist),2) as shortest
+from temp2
