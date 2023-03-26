@@ -1,0 +1,26 @@
+# Write your MySQL query statement below
+with temp as(
+    select lat,lon,count(pid) as cnt
+    from insurance
+    group by lat,lon
+),
+temp2 as (
+    select tiv_2015, count(pid) as cnts
+    from insurance
+    group by tiv_2015
+)
+,
+temp3 as(
+    select i.pid, i.tiv_2015, i.tiv_2016, i.lat,i.lon,t.cnt
+    from insurance i left join temp t
+    on i.lat=t.lat and i.lon = t.lon
+),
+temp4 as(
+    select t3.*, t2.cnts
+    from temp3 t3 left join temp2 t2
+    on t3.tiv_2015 = t2.tiv_2015
+)
+
+select round(sum(tiv_2016),2) as tiv_2016
+from temp4
+where cnt = 1 and cnts > 1
