@@ -1,0 +1,31 @@
+# Write your MySQL query statement below
+with temp as(
+    select accepter_id, count(*) as cnt
+    from requestaccepted
+    group by accepter_id
+),
+temp2 as(
+    select requester_id, count(*) as cnts
+    from requestaccepted
+    group by requester_id
+),
+temp3 as (
+    select t.accepter_id, coalesce(t.cnt,0) as cnt, t2.requester_id, coalesce(t2.cnts,0) as cnts
+    from temp t left join temp2 t2
+    on t.accepter_id = t2.requester_id
+    union 
+    select t.accepter_id, coalesce(t.cnt,0) as cnt,t2.requester_id, coalesce(t2.cnts,0) as cnts
+    from temp t right join temp2 t2
+    on t.accepter_id = t2.requester_id
+),
+temp4 as (
+    select t.accepter_id, t.requester_id, cnt + cnts as total
+    from temp3 t
+),
+temp5 as(
+    select coalesce(t.accepter_id, t.requester_id) as id1, coalesce(t.requester_id, t.accepter_id) as id2, total
+    from temp4 t
+)
+select id1 as id, total as num
+from temp5
+where total = (select max(total) from temp5)
