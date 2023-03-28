@@ -1,0 +1,42 @@
+# Write your MySQL query statement below
+## people that have shopped from that shop
+with temp as (
+    select distinct(user_id), 'yes' as shoppers
+    from invoices
+),
+temp2 as (
+    select c1.user_id, c1.contact_name, c1.contact_email, coalesce(c2.customer_id,-1) as contact_id
+    from contacts c1 left join customers c2
+    on c1.contact_email = c2.email
+),
+temp3 as (
+    select user_id, count(*) as trusted_contacts_cnt
+    from temp2
+    where contact_id > 0
+    group by user_id
+    
+),
+temp4 as (
+    select i.*, coalesce(t.trusted_contacts_cnt,0) as trusted_contacts_cnt
+    from invoices i left join temp3 t
+    on i.user_id = t.user_id
+),
+temp5 as(
+    select user_id, count(*) as contacts_cnt
+    from contacts
+    group by user_id
+),
+temp6 as (
+    select t4.*, coalesce(t5.contacts_cnt,0) as contacts_cnt
+    from temp4 t4 left join temp5 t5
+    on t4.user_id = t5.user_id
+),
+temp7 as(
+    select t6.*, c.customer_name
+    from temp6 t6 left join customers c
+    on t6.user_id = c.customer_id
+)
+
+select invoice_id, customer_name,price,contacts_cnt,trusted_contacts_cnt
+from temp7
+order by invoice_id asc
