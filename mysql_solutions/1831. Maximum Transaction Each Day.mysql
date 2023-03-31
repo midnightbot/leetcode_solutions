@@ -1,0 +1,20 @@
+# Write your MySQL query statement below
+with temp as(
+    select transaction_id, date(day) as date, amount
+    from Transactions
+),
+temp2 as(
+    select date,max(amount) as maxs
+    from temp
+    group by date
+),
+temp3 as(
+    select t1.transaction_id, t1.date, t1.amount, t2.maxs
+    from temp t1 left join temp2 t2
+    on t1.date = t2.date
+)
+
+select transaction_id
+from temp3 
+where amount = maxs
+order by transaction_id asc
