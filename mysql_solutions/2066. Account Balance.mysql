@@ -1,0 +1,16 @@
+# Write your MySQL query statement below
+
+with temp as(
+    select account_id, day, if(type='Deposit', amount, -amount) as op
+    from Transactions
+    order by account_id, day
+),
+temp2 as (
+    select t1.account_id, t1.day, sum(t2.op) as balance
+    from temp t1,temp t2
+    where t1.day >= t2.day and t1.account_id = t2.account_id
+    group by t1.account_id, t1.day
+    order by t1.account_id, t1.day
+)
+
+select * from temp2
