@@ -1,0 +1,23 @@
+# Write your MySQL query statement below
+
+with temp as(
+    select activity, count(*) as cnt
+    from friends
+    group by activity
+),
+temp2 as (
+    select a.*, coalesce(t.cnt,0) as cnt
+    from activities a left join temp t
+    on a.name = t.activity
+),
+temp3 as (
+    select max(cnt)
+    from temp2
+),
+temp4 as(
+    select min(cnt)
+    from temp2
+)
+select name as activity
+from temp2
+where cnt not in (select * from temp3) and cnt not in (select * from temp4)
