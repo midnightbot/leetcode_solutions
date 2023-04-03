@@ -1,0 +1,30 @@
+# Write your MySQL query statement below
+with temp as(
+    select departure_airport as id, sum(flights_count) as cnt1
+    from flights
+    group by departure_airport
+),
+temp1 as(
+    select arrival_airport as id, sum(flights_count) as cnt2
+    from flights
+    group by arrival_airport
+),
+temp2 as (
+    select t.id, t.cnt1, coalesce(t1.cnt2,0) as cnt2
+    from temp t left join temp1 t1
+    on t.id = t1.id
+
+    union all 
+
+    select coalesce(t1.id, -1), coalesce(t.cnt1,0), t1.cnt2 as cnt2
+    from temp t right join temp1 t1
+    on t.id = t1.id
+),
+temp3 as (
+    select id, cnt1 + cnt2 as total
+    from temp2
+)
+#select * from temp3
+select distinct(id) as airport_id
+from temp3
+where total = (select max(total) from temp3)
