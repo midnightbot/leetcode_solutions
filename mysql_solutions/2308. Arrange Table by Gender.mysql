@@ -1,0 +1,42 @@
+# Write your MySQL query statement below
+with temp as(
+    select user_id, 'a'
+    from genders
+    where gender = 'female'
+    order by user_id
+),
+temp1 as(
+    select user_id, 'a', (rank() over (order by user_id) - 1) as ranks
+    from temp
+),
+temp2 as(
+    select user_id, 'c'
+    from genders
+    where gender = 'male'
+    order by user_id
+),
+temp3 as(
+    select user_id, 'c', (rank() over (order by user_id) - 1) as ranks
+    from temp2
+),
+temp4 as(
+    select user_id, 'b'
+    from genders
+    where gender = 'other'
+    order by user_id
+),
+temp5 as(
+    select user_id, 'b', (rank() over (order by user_id) - 1) as ranks
+    from temp4
+),
+temp6 as (
+    select * from temp1
+    union all
+    select * from temp3
+    union all
+    select * from temp5
+)
+select user_id, replace(replace(replace(a, 'a', 'female'), 'b', 'other'), 'c','male') as gender
+from temp6
+order by ranks, a
+
