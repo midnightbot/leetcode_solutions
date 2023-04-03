@@ -1,0 +1,33 @@
+# Write your MySQL query statement below
+
+with temp as(
+    select account_id, start_date, end_date, year(start_date) as year1, year(end_date) as year2
+    from subscriptions
+),
+## people who bought subscription in 2021
+temp1 as (
+    select t.*
+    from temp t
+    where t.year1 = '2021' or t.year2='2021'
+),
+
+temp2 as(
+    select account_id, stream_date
+    from streams
+    where year(stream_date) = 2021
+),
+
+temp3 as(
+    select distinct(account_id)
+    from temp2
+),
+
+temp4 as (
+    select t1.account_id as a, t1.year1, t1.year2, t3.account_id
+    from temp1 t1 left join temp3 t3
+    on t1.account_id = t3.account_id
+)
+
+select count(a) as accounts_count
+from temp4
+where account_id is null
