@@ -1,0 +1,32 @@
+# Write your MySQL query statement below
+with temp as(
+    select s.name, @a:=@a+1 as id
+    from student s, (select @a:=0) t
+    where continent = 'America'
+    order by s.name asc
+),
+temp2 as(
+    select s.name, @b:=@b+1 as id
+    from student s, (select @b:=0) t
+    where continent = 'Europe'
+    order by s.name asc
+),
+temp3 as(
+    select s.name, @c:=@c+1 as id
+    from student s, (select @c:=0) t
+    where continent = 'Asia'
+    order by s.name asc
+),
+temp4 as(
+    select t.name as 'America', t.id, t1.name as 'Europe'
+    from temp t left outer join temp2 t1
+    on t.id = t1.id
+),
+temp5 as(
+    select t4.*, t3.name as 'Asia'
+    from temp4 t4 left outer join temp3 t3
+    on t4.id = t3.id
+)
+
+select America, Asia, Europe
+from temp5
