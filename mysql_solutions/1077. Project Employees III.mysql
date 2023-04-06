@@ -1,0 +1,20 @@
+# Write your MySQL query statement below
+with temp as(
+    select p.project_id, p.employee_id, e.name, e.experience_years
+    from project p left join employee e
+    on p.employee_id = e.employee_id
+),
+temp1 as(
+    select project_id, max(experience_years) as maxs
+    from temp
+    group by project_id
+),
+temp2 as(
+    select t.project_id, t.employee_id, t.experience_years, t1.maxs
+    from temp t left join temp1 t1
+    on t.project_id = t1.project_id
+)
+
+select project_id, employee_id
+from temp2
+where experience_years = maxs
