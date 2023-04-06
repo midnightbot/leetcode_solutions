@@ -1,0 +1,16 @@
+# Write your MySQL query statement below
+with temp as(
+    select log_id, (@a:=@a+1) as id
+    from logs, (select @a:=0) as t
+),
+temp2 as (
+    select log_id, (log_id - id) as diff
+    from temp
+),
+temp3 as(
+    select min(log_id) as start_id, max(log_id) as end_id, diff
+    from temp2
+    group by diff
+)
+select start_id, end_id
+from temp3
