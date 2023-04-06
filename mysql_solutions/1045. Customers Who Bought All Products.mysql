@@ -1,0 +1,13 @@
+# Write your MySQL query statement below
+with temp as(
+    select customer_id, count(distinct(product_key)) as cnt
+    from customer
+    group by customer_id
+),
+temp2 as(
+    select count(distinct(product_key))
+    from product
+)
+select customer_id
+from temp
+where cnt = (select * from temp2)
