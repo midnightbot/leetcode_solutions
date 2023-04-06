@@ -1,0 +1,27 @@
+# Write your MySQL query statement below
+with temp as(
+    select p.invoice_id, p.product_id, p.quantity, e.price
+    from purchases p left join products e
+    on p.product_id = e.product_id
+),
+temp1 as(
+    select invoice_id, product_id, quantity*price as total, quantity
+    from temp
+),
+temp2 as(
+    select invoice_id, sum(total) as total
+    from temp1
+    group by invoice_id
+),
+temp3 as(
+    select max(total)
+    from temp2
+),
+temp4 as(
+    select min(invoice_id)
+    from temp2
+    where total = (select * from temp3)
+)
+select product_id, quantity, total as price
+from temp1
+where invoice_id  = (select * from temp4)
