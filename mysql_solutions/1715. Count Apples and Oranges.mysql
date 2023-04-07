@@ -1,0 +1,9 @@
+# Write your MySQL query statement below
+with temp as(
+    select b.box_id, b.chest_id, b.apple_count, b.orange_count, coalesce(c.apple_count,0) as cnt1, coalesce(c.orange_count,0) as cnt2
+    from boxes b left join chests c
+    on b.chest_id = c.chest_id
+)
+
+select (sum(apple_count) + sum(cnt1)) as apple_count, (sum(orange_count) + sum(cnt2)) as orange_count
+from temp
