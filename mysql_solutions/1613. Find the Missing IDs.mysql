@@ -1,0 +1,14 @@
+# Write your MySQL query statement below
+with RECURSIVE temp1 as(
+    select 1 as val
+    union all
+    select val+1 from temp1 where val < 100
+),
+temp2 as(
+    select val
+    from temp1
+    where val < (select max(customer_id) from customers)
+)
+select val as ids
+from temp2
+where val not in (select customer_id from customers)
