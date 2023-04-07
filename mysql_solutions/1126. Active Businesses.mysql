@@ -1,0 +1,25 @@
+# Write your MySQL query statement below
+with temp as(
+    select event_type, avg(occurences) as avg
+    from events
+    group by event_type
+),
+temp1 as(
+    select e.*, t.avg
+    from events e left join temp t
+    on e.event_type = t.event_type
+),
+temp2 as(
+    select * 
+    from temp1
+    where occurences > avg
+),
+temp3 as(
+    select business_id, count(*) as c
+    from temp2
+    group by business_id
+)
+#select * from temp3
+select distinct(business_id)
+from temp3
+where c > 1
