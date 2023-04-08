@@ -1,0 +1,26 @@
+# Write your MySQL query statement below
+with temp as(
+    select 'Low Salary' as category,count(account_id) as cnt
+    from accounts
+    where income<20000
+),
+temp1 as(
+    select 'Average Salary' as category,count(account_id) as cnt
+    from accounts
+    where income>=20000 and income<=50000
+),
+temp2 as(
+    select 'High Salary' as category,count(account_id) as cnt
+    from accounts
+    where income>50000
+),
+temp3 as(
+    select * from temp
+    union all 
+    select * from temp1
+    union all 
+    select * from temp2
+)
+
+select category, cnt as accounts_count
+from temp3
