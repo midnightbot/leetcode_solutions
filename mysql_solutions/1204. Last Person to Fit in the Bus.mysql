@@ -1,0 +1,30 @@
+# Write your MySQL query statement below
+with temp as(
+    select * from queue
+    order by turn
+),
+temp2 as(
+    select t1.*, t2.weight as w
+    from temp t1 join temp t2
+    on t1.turn >= t2.turn
+),
+temp3 as(
+    select turn,person_name, sum(w) as wt
+    from temp2
+    group by turn
+    order by turn
+),
+temp4 as(
+    select * 
+    from temp3
+    where wt<=1000
+),
+temp5 as(
+    select person_name
+    from temp4
+    order by wt desc
+    limit 1
+)
+
+select * 
+from temp5
