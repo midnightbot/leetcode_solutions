@@ -1,0 +1,43 @@
+# Write your MySQL query statement below
+with temp0 as(
+    select m.*, u.name
+    from movierating m left join users u
+    on m.user_id = u.user_id
+),
+## user who has rated most movies, if tie smallest lexical name user
+temp as(
+    select user_id, name,  count(*) as cnt
+    from temp0
+    group by user_id
+    order by cnt desc, name asc
+    limit 1
+),
+temp1 as(
+    select m.*, m1.title
+    from movierating m left join movies m1
+    on m.movie_id = m1.movie_id
+),
+temp2 as(
+    select movie_id, title, rating, month(created_at) as mnth
+    from temp1
+),
+temp3 as (
+    select *
+    from temp2
+    where mnth = 2
+),
+## movie with highest avg rating in feb, if tie smallest lexical title
+temp4 as(
+    select movie_id, title, avg(rating) as avgs
+    from temp3
+    group by movie_id
+    order by avgs desc, title asc
+    limit 1
+),
+temp5 as(
+    select name as results from temp
+    union
+    select title as results from temp4
+)
+
+select * from temp5
