@@ -1,0 +1,43 @@
+# Write your MySQL query statement below
+## find min score and max score for each exam
+with temp as(
+    select exam_id, min(score) as mins, max(score) as maxs
+    from exam
+    group by exam_id
+),
+## add the min score and max score of each exam to the exam table
+temp1 as(
+    select e.exam_id, e.student_id, e.score, t.mins, t.maxs
+    from exam e left join temp t
+    on e.exam_id = t.exam_id
+),
+## find records where score is not min or max
+temp2 as(
+    select student_id, count(*) as quiet_count
+    from temp1
+    where score!=mins and score!=maxs
+    group by student_id
+),
+## find total exams appeared by each student
+temp3 as(
+    select student_id, count(*) as exam_count
+    from exam
+    group by student_id
+),
+## join quiet_exam count for each student and total exams appeared by each student
+temp4 as(
+    select t2.student_id, t2.quiet_count, t3.exam_count
+    from temp2 t2 left join temp3 t3
+    on t2.student_id = t3.student_id
+),
+## find students quiet in all exams
+temp5 as(
+    select student_id
+    from temp4
+    where quiet_count = exam_count
+)
+
+select t5.student_id, s.student_name
+from temp5 t5 left join student s
+on t5.student_id = s.student_id
+order by student_id
