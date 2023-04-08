@@ -1,0 +1,40 @@
+# Write your MySQL query statement below
+with temp as(
+    select gold_medal as usr, contest_id
+    from contests
+),
+temp1 as(
+    select silver_medal as usr, contest_id
+    from contests
+),
+temp2 as(
+    select bronze_medal as usr, contest_id
+    from contests
+),
+temp3 as(
+    select * from temp
+    union all
+    select * from temp1
+    union all
+    select * from temp2
+),
+## The user won any medal in three or more consecutive contests.
+temp4 as(
+    select distinct(a.usr)
+    from temp3 a
+    where a.contest_id+1 in (select contest_id from temp3 where usr = a.usr) and a.contest_id+2 in (select contest_id from temp3 where usr = a.usr)
+),
+## users with three or more gold medals
+temp5 as(
+    select usr, count(usr) as cnt
+    from temp
+    group by usr
+),
+temp6 as(
+    select * from temp4
+    union  
+    select distinct(usr) from temp5 where cnt >= 3
+)
+select b.name, b.mail
+from temp6 a left join users b 
+on a.usr = b.user_id
