@@ -1,0 +1,25 @@
+# Write your MySQL query statement below
+with temp as(
+    select product_id, max(order_date) as maxs
+    from orders
+    group by product_id
+),
+temp1 as(
+    select o.order_id, o.order_date, o.customer_id, o.product_id, t.maxs
+    from orders o left join temp t
+    on o.product_id = t.product_id
+),
+temp2 as(
+    select *
+    from temp1
+    where order_date = maxs
+),
+temp3 as(
+    select t2.*, p.product_name
+    from temp2 t2 left join products p
+    on t2.product_id = p.product_id
+)
+
+select product_name, product_id, order_id, order_date
+from temp3
+order by product_name,product_id, order_id
