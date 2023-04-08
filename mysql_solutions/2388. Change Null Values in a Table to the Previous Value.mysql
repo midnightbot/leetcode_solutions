@@ -1,0 +1,10 @@
+# Write your MySQL query statement below
+with temp as(
+    select id, drink, @a:=@a+1 as cnt
+    from coffeeshop, (select @a:=0) as tmp
+),
+temp1 as(
+    select id, if(drink is null, @lastdrink, @lastdrink:=drink) as drink
+    from temp, (select @lastdrink:=(select drink from temp where cnt=1)) as l
+)
+select * from temp1
