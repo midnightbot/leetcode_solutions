@@ -1,0 +1,22 @@
+# Write your MySQL query statement below
+with temp as(
+    select customer_id, min(order_date) as mins
+    from delivery
+    group by customer_id
+),
+temp1 as(
+    select d.*, t.mins
+    from delivery d left join temp t
+    on d.customer_id = t.customer_id
+),
+temp2 as(
+    select count(*) as cnt1
+    from temp1
+    where customer_pref_delivery_date = mins and order_date = mins
+),
+temp3 as(
+    select count(*) as cnt2
+    from temp
+)
+select round((a.cnt1/b.cnt2)*100,2) as immediate_percentage
+from temp2 a , temp3 b
