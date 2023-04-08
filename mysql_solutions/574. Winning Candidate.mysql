@@ -1,0 +1,22 @@
+# Write your MySQL query statement below
+with temp as(
+    select candidateId, count(*) as cnt
+    from vote
+    group by candidateId
+),
+temp1 as(
+    select max(cnt) as maxs
+    from temp
+),
+temp2 as(
+    select candidateId
+    from temp
+    where cnt = (select maxs from temp1)
+),
+temp3 as(
+    select t2.candidateId, c.name
+    from temp2 t2 left join candidate c
+    on t2.candidateId = c.id
+)
+select name
+from temp3
