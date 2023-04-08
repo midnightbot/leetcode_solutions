@@ -1,0 +1,16 @@
+# Write your MySQL query statement below
+with temp as(
+    select product_id, min(year) as mins
+    from sales
+    group by product_id
+),
+temp1 as(
+    select s.*, t.mins
+    from sales s left join temp t
+    on s.product_id = t.product_id
+)
+
+
+select product_id, year as first_year, quantity, price
+from temp1
+where year = mins
