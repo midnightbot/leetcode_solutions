@@ -1,0 +1,11 @@
+# Write your MySQL query statement below
+with temp as(
+    select viewer_id, view_date, count(distinct(article_id)) as cnt
+    from views
+    group by viewer_id, view_date
+)
+
+select distinct(viewer_id) as id
+from temp
+where cnt >=2
+order by id
