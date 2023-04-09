@@ -1,0 +1,18 @@
+# Write your MySQL query statement below
+with temp as(
+    select first_col, @a:=@a+1 as it
+    from data, (select @a:=0) as l
+    order by first_col asc
+),
+temp1 as(
+    select second_col, @b:=@b+1 as it
+    from data, (select @b:=0) as l
+    order by second_col desc
+),
+temp2 as(
+    select t.first_col, t1.second_col
+    from temp t left join temp1 t1
+    on t.it = t1.it
+)
+
+select * from temp2
