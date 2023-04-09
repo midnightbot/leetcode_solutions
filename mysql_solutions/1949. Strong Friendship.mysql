@@ -1,0 +1,14 @@
+# Write your MySQL query statement below
+with temp as(
+    select user1_id as usr, user2_id as frnd
+    from friendship
+    union all
+    select user2_id as usr, user1_id as frnd
+    from friendship
+)
+
+select a.usr as user1_id, b.usr as user2_id, count(*) as common_friend
+from temp a join temp b
+where a.usr < b.usr and a.frnd = b.frnd and (a.usr,b.usr) in (select * from temp)
+group by a.usr, b.usr
+having common_friend >= 3
