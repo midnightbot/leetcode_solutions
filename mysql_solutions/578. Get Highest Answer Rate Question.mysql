@@ -1,0 +1,15 @@
+# Write your MySQL query statement below
+with temp as(
+    select question_id, sum(case when action='show' then 1 else 0 end) as show_cnt, sum(case when action='answer' then 1 else 0 end) as answer_cnt
+    from surveylog
+    group by question_id
+),
+temp1 as(
+    select question_id, show_cnt, answer_cnt, answer_cnt/show_cnt as ratio
+    from temp
+    order by ratio desc, question_id asc
+    limit 1
+)
+
+select question_id as survey_log
+from temp1
