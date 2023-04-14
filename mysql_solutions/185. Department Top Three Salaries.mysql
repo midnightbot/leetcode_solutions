@@ -1,0 +1,15 @@
+# Write your MySQL query statement below
+with temp1 as (
+    select e1.departmentId, e1.name ,e1.salary
+    from employee e1
+    where 3 >   (select count(distinct(e2.salary)) 
+                    from employee e2
+                    where e1.departmentId = e2.departmentId
+                    and e1.salary < e2.salary)
+)
+
+#select * from temp1
+select d.name as Department, t1.name as Employee, t1.salary as Salary
+from temp1 t1 left join department d
+on t1.departmentId = d.id
+order by Salary
