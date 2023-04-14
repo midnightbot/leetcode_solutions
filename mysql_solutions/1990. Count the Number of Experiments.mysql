@@ -1,0 +1,28 @@
+# Write your MySQL query statement below
+with temp as(
+    select platform, experiment_name, count(*) as count
+    from experiments
+    group by platform, experiment_name
+),
+temp1 as(
+    select * from
+    (select 'Android' as platform
+    union
+    select 'IOS' as platform
+    union 
+    select 'Web' as platform) as a
+    join
+    (select 'Reading' as experiment_name
+    union
+    select 'Sports' as experiment_name
+    union
+    select 'Programming' as experiment_name) as b
+
+),
+temp2 as(
+    select t1.*, coalesce(t.count,0) as num_experiments
+    from temp1 t1 left join temp t
+    on t1.platform = t.platform and t1.experiment_name = t.experiment_name
+)
+
+select * from temp2
