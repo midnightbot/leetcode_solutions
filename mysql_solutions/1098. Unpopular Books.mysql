@@ -1,0 +1,37 @@
+# Write your MySQL query statement below
+with temp as(
+    select o.*, b.name, b.available_from
+    from orders o left join books b
+    on o.book_id = b.book_id
+),
+temp1 as(
+    select t.*, datediff(t.dispatch_date, '2019-06-23') as a, datediff(t.available_from, '2019-06-23') as b
+    from temp t
+),
+temp2 as(
+    select * 
+    from temp1
+    where b<-30 and a<0 and a>-365
+),
+temp3 as(
+    select book_id, name, sum(quantity) as cnt
+    from temp2
+    group by book_id
+),
+temp4 as(
+    select book_id, name
+    from temp3 
+    union
+    select book_id, name
+    from books
+    where datediff(available_from, '2019-06-23') < -30
+),
+temp5 as(
+    select t4.*, coalesce(t3.cnt,0) as cnt
+    from temp4 t4 left join temp3 t3
+    on t4.book_id = t3.book_id
+)
+
+select book_id, name
+from temp5
+where cnt < 10
