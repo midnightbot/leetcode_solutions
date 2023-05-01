@@ -1,0 +1,15 @@
+# Write your MySQL query statement below
+with temp as(
+    select a.id as id1, a.x_value as x1, a.y_value as y1, b.id as id2, b.x_value as x2, b.y_value as y2
+    from points a, points b
+    where a.id < b.id
+),
+temp1 as(
+    select id1 as P1,id2 as P2, abs(x1-x2)*abs(y1-y2) as AREA
+    from temp
+)
+
+select * 
+from temp1
+where area > 0
+order by area desc, p1 asc, p2 asc
