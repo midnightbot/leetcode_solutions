@@ -1,0 +1,54 @@
+# Write your MySQL query statement below
+## cancellation rate
+
+with temp as(
+    select a.client_id, a.driver_id, a.status, a.request_at, b.banned
+    from trips a left join users b
+    on a.client_id = b.users_id
+),
+temp1 as(
+    select a.*, b.banned as banned1
+    from temp a left join users b
+    on a.driver_id = b.users_id
+),
+temp2 as(
+    select * 
+    from temp1
+    where banned = 'No' and banned1 = 'No'
+),
+temp3 as(
+    select request_at, count(*) as cancel_count
+    from temp2
+    where status != 'completed'
+    group by request_at
+),
+temp4 as(
+    select request_at, count(*) as success_count
+    from temp2
+    where status = 'completed'
+    group by request_at
+),
+temp5 as(
+    select t3.request_at, t3.cancel_count, coalesce(t4.success_count,0) as success_count
+    from temp3 t3 left join temp4 t4
+    on t3.request_at = t4.request_at
+    union 
+    select t4.request_at, coalesce(t3.cancel_count,0) as cancel_count, t4.success_count
+    from temp3 t3 right join temp4 t4
+    on t3.request_at = t4.request_at
+
+),
+temp6 as(
+    select request_at, cancel_count, success_count, (cancel_count + success_count) as total
+    from temp5
+),
+temp7 as(
+    select request_at as 'Day', round(cancel_count/total,2) as 'Cancellation Rate'
+    from temp6
+    order by request_at
+)
+
+
+select * 
+from temp7
+where Day >= '2013-10-01' and Day <= '2013-10-03'
