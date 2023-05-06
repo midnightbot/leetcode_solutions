@@ -1,0 +1,43 @@
+# Write your MySQL query statement below
+with temp as(
+    select *, @a:=@a+1 as cnt
+    from uservisits, (select @a:=0)  tmp
+    order by user_id asc, visit_date desc
+),
+temp1 as(
+    select user_id, visit_date, cnt
+    from temp
+),
+temp2 as(
+    select a.user_id, a.visit_date as a1, b.visit_date as a2
+    from temp1 a join temp1 b
+    on a.user_id = b.user_id and a.cnt = b.cnt + 1
+),
+temp3 as(
+    select user_id, abs(datediff(max(visit_date), '2021-1-1')) as diff
+    from uservisits
+    group by user_id
+),
+temp4 as(
+    select user_id, a1, a2, abs(datediff(a1,a2)) as diff
+    from temp2
+),
+temp5 as(
+    select user_id, max(diff) as diff
+    from temp4
+    group by user_id
+),
+temp6 as(
+    select * from temp5 
+    union all
+    select * from temp3
+),
+temp7 as(
+    select user_id, max(diff) as biggest_window
+    from temp6
+    group by user_id
+)
+
+select * 
+from temp7
+order by user_id asc
