@@ -1,0 +1,23 @@
+# Write your MySQL query statement below
+with temp as(
+    select a.user_id as id1, a.follower_id as f1, b.user_id as id2, b.follower_id as f2
+    from relations a cross join relations b
+),
+temp2 as(
+    select *
+    from temp
+    where id1!=id2 and f1 = f2 and id1 < id2
+),
+temp3 as(
+    select id1, id2, count(*) as cnt
+    from temp2
+    group by id1, id2
+),
+temp4 as(
+    select id1 as user1_id, id2 as user2_id
+    from temp3
+    where cnt = (select max(cnt) from temp3)
+)
+
+select * 
+from temp4
