@@ -1,0 +1,48 @@
+# Write your MySQL query statement below
+## (100*count(purchase))/count(visit)
+
+with temp as(
+    select a.visit_id, a.member_id, a.visit_date, coalesce(b.charged_amount,0) as amt
+    from visits a left join purchases b
+    on a.visit_id = b.visit_id
+),
+temp1 as(
+    select member_id, count(*) as cnt1
+    from temp
+    where amt = 0
+    group by member_id
+),
+temp2 as(
+    select member_id, count(*) as cnt2
+    from temp
+    where amt!=0
+    group by member_id
+),
+temp3 as(
+    select m.member_id, m.name, coalesce(t1.cnt1,0) as c1
+    from members m left join temp1 t1
+    on m.member_id = t1.member_id
+),
+temp4 as(
+    select t3.*, coalesce(t2.cnt2,0) as c2
+    from temp3 t3 left join temp2 t2
+    on t3.member_id = t2.member_id
+),
+temp5 as(
+    select member_id, name, coalesce((100*c2/(c1+c2)),-1) as percent
+    from temp4
+),
+temp6 as(
+    select member_id, name, 
+    case 
+    when percent>=80 then 'Diamond'
+    when percent>=50 and percent<80 then 'Gold'
+    when percent<50 and percent>=0 then 'Silver'
+    else 'Bronze'
+    end as category
+    from temp5
+
+)
+select *
+from temp6
+order by member_id
