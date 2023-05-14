@@ -1,0 +1,35 @@
+# Write your MySQL query statement below
+with temp as(
+    select order_date, count(*) as c1
+    from delivery
+    where order_date = customer_pref_delivery_date
+    group by order_date
+),
+temp2 as(
+    select order_date, count(*) as c2
+    from delivery
+    where order_date != customer_pref_delivery_date
+    group by order_date
+),
+temp3 as(
+    select distinct(order_date) as date
+    from delivery
+),
+temp4 as(
+    select a.date, coalesce(b.c1,0) as d1
+    from temp3 a left join temp b
+    on a.date = b.order_date
+),
+temp5 as(
+    select t4.*, coalesce(t2.c2,0) as d2
+    from temp4 t4 left join temp2 t2
+    on t4.date = t2.order_date
+),
+temp6 as(
+    select date as order_date, round((d1/(d1+d2))*100,2) as immediate_percentage
+    from temp5
+)
+
+select * 
+from temp6
+order by order_date asc
