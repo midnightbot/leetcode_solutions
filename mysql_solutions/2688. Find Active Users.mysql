@@ -1,0 +1,19 @@
+# Write your MySQL query statement below
+with temp as(
+    select a.user_id, a.created_at as b1, b.created_at as b2
+    from users a, users b
+    where datediff(a.created_at, b.created_at)<=7 and datediff(a.created_at, b.created_at)>0 and a.user_id = b.user_id
+),
+temp2 as(
+    select user_id, created_at, count(*) cnt
+    from users
+    group by user_id, created_at
+),
+temp3 as(
+    select * from temp
+    union all
+    select * from temp2 where cnt>1
+)
+
+select distinct(user_id)
+from temp3
