@@ -25,3 +25,36 @@ temp2 as(
 select * 
 from temp2
 order by id
+
+
+## alternate solution
+# Write your MySQL query statement below
+## for 'n' consecutive days, replace 4 by n
+with variables as(
+    select @a:=4 as n
+),
+temp0 as(
+    select id, login_date
+    from logins 
+    group by id,login_date
+),
+temp as(
+    select a.id, a.login_date, count(b.login_date) as cnt
+    from temp0 a, temp0 b
+    where datediff(a.login_date, b.login_date)<=(select * from variables) and datediff(a.login_date, b.login_date)>0 and a.id = b.id
+    group by a.id, a.login_date
+),
+temp1 as(
+    select distinct(id) as id
+    from temp
+    where cnt >= (select * from variables)
+),
+temp2 as(
+    select t1.id,a.name
+    from temp1 t1 left join accounts a
+    on t1.id = a.id
+)
+
+select * 
+from temp2
+order by id
