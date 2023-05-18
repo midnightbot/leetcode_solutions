@@ -1,0 +1,71 @@
+## order the table by player_id and match_id
+with temp as(
+    select * 
+    from matches
+    order by player_id, match_day
+),
+## just add a cnt variable
+temp1 as(
+    select player_id, match_day, result,  case
+    when result = 'Win' then 1
+    else -1
+    end as res, @a:=@a+1 as cnt
+    from temp, (select @a:=0) as t
+),
+## find all places where streak breaks
+temp2 as(
+    select player_id, cnt
+    from temp1
+    where res = -1
+),
+## find the min dates for all players
+temp3 as(
+    select t.player_id, t.cnt-1 as cnt
+    from temp1 t
+    where t.match_day = (select min(match_day) from temp1 tt where t.player_id = tt.player_id)
+),
+## find the max dates for all players
+temp4 as(
+    select t.player_id, t.cnt+1 as cnt
+    from temp1 t
+    where t.match_day = (select max(match_day) from temp1 tt where t.player_id = tt.player_id)
+),
+## join all the break points
+temp5 as(
+    select * from temp2
+    union all 
+    select player_id, cnt from temp3
+    union all
+    select player_id, cnt from temp4
+    order by player_id, cnt
+),
+## assign increasing counter to each row
+temp6 as(
+    select player_id, cnt, @b:=@b+1 as pointer
+    from temp5, (select @b:=0) as t
+),
+## find difference between consecutive breakpoints for each player_id
+temp7 as(
+    select a.player_id, b.cnt - a.cnt -1 as diff
+    from temp6 a, temp6 b
+    where a.player_id = b.player_id and a.pointer = b.pointer - 1
+),
+## find the maximum difference between consecutive breakpoints for each player_id
+temp8 as(
+    select player_id, max(diff) as longest_streak
+    from temp7
+    group by player_id
+    order by player_id
+)
+select * 
+from temp8
+
+## example
+## player_id1 has [win,1], [win,2], [draw,3], [win,4]
+## temp2 -> [3]
+## temp3 -> [0]
+## temp4 -> [5]
+## temp5 -> [0,3,5]
+## temp6 find consecutive diff [3-0-1, 5-3-1] -> [2,1]
+## temp7 find max -> [2]
+## for player_id1 longest streak is 2
