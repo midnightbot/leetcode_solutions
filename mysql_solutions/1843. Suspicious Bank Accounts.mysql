@@ -1,0 +1,35 @@
+# Write your MySQL query statement below
+with temp as(
+    select account_id, amount, month(day) as mnth, year(day) as yr
+    from transactions
+    where type = 'Creditor'
+),
+temp2 as(
+    select account_id, sum(amount) as income, mnth, yr
+    from temp
+    group by account_id, mnth, yr
+    order by account_id, mnth, yr
+),
+temp3 as(
+    select t2.*, @a:=@a+1 as counter
+    from temp2 t2, (select @a:=0) as att
+),
+temp4 as(
+    select t3.*, a.max_income
+    from temp3 t3 left join accounts a
+    on t3.account_id = a.account_id
+
+),
+temp5 as(
+    select * 
+    from temp4
+    where income > max_income
+),
+temp6 as(
+    select distinct(a.account_id) as account_id
+    from temp5 a, temp5 b
+    where a.counter = b.counter-1 and a.account_id = b.account_id and a.yr = b.yr and a.mnth = b.mnth-1
+    
+)
+
+select * from temp6
