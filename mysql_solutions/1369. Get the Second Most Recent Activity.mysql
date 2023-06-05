@@ -1,0 +1,32 @@
+# Write your MySQL query statement below
+## order the table by username and startdate and assign each row a counter
+with temp as(
+    select u.*, @a:=@a+1 as counter
+    from userActivity u, (select @a:=0) t
+    order by username asc, startDate asc
+),
+## for each user find the max counter value and number of rows in the table
+temp1 as(
+    select username, max(counter) as maxs, count(*) as cnt
+    from temp
+    group by username
+),
+## if a user just has only one row select that
+## if a user has 2 or more rows we need to select second recent i.e second largest counter
+temp2 as(
+    select username, case
+    when cnt=1 then maxs
+    else maxs-1
+    end as row_counter
+    from temp1
+),
+## create the final ans table
+temp3 as(
+    select t.username, t.activity, t.startDate, t.endDate
+    from temp2 t2 left join temp t
+    on t2.username = t.username and t2.row_counter = t.counter
+)
+
+
+select * 
+from temp3
