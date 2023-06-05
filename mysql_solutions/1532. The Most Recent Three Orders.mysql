@@ -1,0 +1,33 @@
+# Write your MySQL query statement below
+with temp as(
+    select o.*, (@a:=@a+1) as counter
+    from orders o,  (select @a:=0) t
+    order by customer_id, order_date asc
+),
+temp1 as (
+    select customer_id, max(counter) as maxs, case
+    when count(*) <=3 then count(*)
+    else 3
+    end as cnt
+    from temp
+    group by customer_id
+),
+temp2 as(
+    select t.*, t1.maxs as largest, t1.maxs - t1.cnt + 1 as lowest
+    from temp t left join temp1 t1
+    on t.customer_id = t1.customer_id
+),
+temp3 as(
+    select *
+    from temp2
+    where lowest <= counter and counter <= largest
+),
+temp4 as(
+    select c.name as customer_name,t3.customer_id, t3.order_id, t3.order_date
+    from temp3 t3 left join customers c
+    on t3.customer_id = c.customer_id
+)
+
+select * 
+from temp4
+order by customer_name asc, customer_id asc, order_date desc
