@@ -1,0 +1,37 @@
+# Write your MySQL query statement below
+## find company avg for each month
+with temp as(
+    select date_format(pay_date, '%Y-%m') as pay_month, avg(amount) as company_avg
+    from salary
+    group by pay_month
+),
+## join salary and employee_id to get department_id of each employee
+temp1 as(
+    select s.*, e.department_id
+    from salary s left join employee e
+    on s.employee_id = e.employee_id
+),
+## find avg department salary for each month
+temp2 as(
+    select date_format(pay_date, '%Y-%m') as pay_month, department_id,avg(amount) as dept_avg
+    from temp1
+    group by pay_month, department_id
+),
+## join the company avg and department avg table
+temp3 as(
+    select t2.*, t.company_avg
+    from temp2 t2 left join temp t
+    on t2.pay_month = t.pay_month 
+),
+## simple if else to check 'same', 'higher', 'lower' condition
+temp4 as(
+    select pay_month, department_id, case
+    when dept_avg = company_avg then 'same'
+    when dept_avg > company_avg then 'higher'
+    else 'lower'
+    end as comparison
+    from temp3
+)
+
+select * 
+from temp4
