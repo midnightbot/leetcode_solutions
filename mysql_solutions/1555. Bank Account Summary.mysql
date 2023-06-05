@@ -1,0 +1,42 @@
+# Write your MySQL query statement below
+## add -amount column to reduce it from senders account
+with temp as(
+    select t.paid_by, t.paid_to, amount as recvd_by, -amount as sent_by
+    from Transactions t
+),
+## creating +amt for user_id getting money
+## creating -amt for user_id sending money
+temp1 as(
+    select paid_by as user_id, sent_by as amt
+    from temp
+    union all
+    select paid_to as user_id, recvd_by as amt
+    from temp
+),
+## calculating balance after all transactions
+temp2 as(
+    select user_id, sum(amt) as balance
+    from temp1
+    group by user_id
+),
+## joining the above result with users table
+temp3 as(
+    select u.*, coalesce(t2.balance,0) as balance
+    from users u left join temp2 t2
+    on u.user_id = t2.user_id
+),
+## find the final credit, credit = credit + balance
+temp4 as(
+    select user_id, user_name, credit + balance as amt
+    from temp3
+),
+## simple if else to find if credit =0 or not
+temp5 as(
+    select user_id, user_name, amt as credit, case
+    when amt > 0 then 'No'
+    else 'Yes'
+    end as credit_limit_breached
+    from temp4
+)
+
+select * from temp5
