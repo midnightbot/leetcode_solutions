@@ -1,0 +1,57 @@
+# Write your MySQL query statement below
+## order the orders table by seller_id and order date and attach a row iterator column
+with temp as(
+    select o.*, @a:=@a+1 as cnt
+    from orders o, (select @a:=0) t
+    order by seller_id, order_date asc
+),
+## find min iterator for each seller and number of items sold by each seller
+temp1 as(
+    select seller_id, count(*) as count, min(cnt) as mins
+    from temp
+    group by seller_id
+),
+## if seller sold only 1 item ans is 'no'
+## if seller sold 2 or more items then find the row_id of the 2nd item sold for each seller
+temp2 as(
+    select seller_id, case
+    when count > 1 then mins+1
+    else -1
+    end as row_id
+    from temp1
+),
+## join this data to the sorted orders table 'temp'
+temp3 as(
+    select t.*, t2.row_id
+    from temp t left join temp2 t2
+    on t.seller_id = t2.seller_id
+),
+## select rows corresponding to 2nd order for each seller
+temp4 as(
+    select *
+    from temp3
+    where cnt = row_id
+),
+## join the above with user table
+temp5 as(
+    select u.user_id, u.favorite_brand, coalesce(t4.item_id,-1) as sold_item
+    from users u left join temp4 t4
+    on u.user_id = t4.seller_id
+),
+## join the items table to find the brand of the second sold item
+temp6 as(
+    select t5.*, coalesce(i.item_brand,-1) as sold_brand_name
+    from temp5 t5 left join items i
+    on t5.sold_item = i.item_id
+),
+## if fav_item = second sold item ans is 'yes' else ans is 'no'
+temp7 as(
+    select user_id as seller_id, case
+    when favorite_brand = sold_brand_name then 'yes'
+    else 'no'
+    end as 2nd_item_fav_brand
+    from temp6
+)
+
+select * 
+from temp7
