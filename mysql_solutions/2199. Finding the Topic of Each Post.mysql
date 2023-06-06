@@ -1,0 +1,14 @@
+# Write your MySQL query statement below
+with temp as(
+    select p.post_id, p.content, k.topic_id, k.word
+    from posts p left join keywords k
+    on concat(' ', lower(p.content), ' ') like concat('% ', lower(k.word), ' %')
+    order by topic_id
+),
+temp1 as(
+    select post_id, coalesce(group_concat(distinct topic_id order by topic_id), 'Ambiguous!') as topic
+    from temp
+    group by post_id
+)
+
+select * from temp1
