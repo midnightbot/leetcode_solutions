@@ -1,0 +1,19 @@
+# Write your MySQL query statement below
+## self join the table on id match and dates within prev 2 days
+with temp1 as(
+    select a.id, a.month, a.salary, b.month as prev_month, b.salary as prev
+    from employee a join employee b
+    on a.id = b.id and (a.month -1 = b.month or a.month - 2 = b.month or a.month = b.month)
+    order by id, month, prev_month
+),
+## sum all the prev_month salary which also includes current month salary
+## do not include record where the month of the employee in max
+temp2 as(
+    select id, month , sum(prev) as Salary
+    from temp1 a
+    where a.month!=(select max(month) from employee b where a.id = b.id)
+    group by id, month
+    order by id asc, month desc
+)
+
+select * from temp2
