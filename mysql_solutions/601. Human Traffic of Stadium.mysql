@@ -1,0 +1,35 @@
+# Write your MySQL query statement below
+with temp as(
+    select a.id as id1, a.visit_date, a.people, b.people as p2, b.id as id2
+    from stadium a join stadium b
+    on a.id + 1 = b.id or a.id + 2 = b.id  or a.id = b.id
+    order by a.id, b.id
+),
+temp1 as(
+    select *
+    from temp
+    where people >= 100 and p2 >=100
+),
+temp2 as(
+    select id1, count(*) as cnt
+    from temp1
+    group by id1
+),
+temp3 as(
+    select t1.*, t2.cnt
+    from temp1 t1 left join temp2 t2 
+    on t1.id1 = t2.id1
+),
+temp4 as(
+    select id1 as id from temp3 where cnt = 3
+    union 
+    select id2 as id from temp3 where cnt = 3
+),
+temp5 as(
+    select t4.id, s.visit_date, s.people
+    from temp4 t4 left join stadium s
+    on t4.id = s.id
+    order by visit_date
+)
+
+select * from temp5
