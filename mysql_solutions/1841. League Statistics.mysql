@@ -1,0 +1,29 @@
+# Write your MySQL query statement below
+with temp as(
+    select home_team_id as team, home_team_goals as goals, away_team_goals as opp_goals
+    from matches
+    union all
+    select away_team_id as team, away_team_goals as goals, home_team_goals as opp_goals
+    from matches
+),
+temp1 as(
+    select team, goals, opp_goals, case
+    when goals > opp_goals then +3
+    when goals < opp_goals then 0
+    else 1
+    end as points
+    from temp
+),
+temp2 as(
+    select team, count(*) as matches_played, sum(points) as points, sum(goals) as goal_for, sum(opp_goals) as goal_against, (sum(goals) - sum(opp_goals)) as goal_diff
+    from temp1
+    group by team
+),
+temp3 as(
+    select t.team_name, t2.matches_played, t2.points, t2.goal_for, t2.goal_against, t2.goal_diff
+    from temp2 t2 left join teams t 
+    on t.team_id = t2.team
+    order by points desc, goal_diff desc, team_name asc
+)
+
+select * from temp3
