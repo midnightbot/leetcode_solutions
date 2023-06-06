@@ -1,0 +1,48 @@
+# Write your MySQL query statement below
+## find install date of each user
+with temp as(
+    select player_id, min(event_date) as install_dates
+    from activity
+    group by player_id
+),
+## find unique install dates
+temp1 as(
+    select distinct(install_dates) as install_dates
+    from temp
+),
+## find number of installs on each day
+temp2 as(
+    select install_dates, count(*) as cnt
+    from temp
+    group by install_dates
+),
+## find players who played on next day after their login day
+temp3 as(
+    select a.*
+    from activity a
+    where a.event_date = (select date_add(b.install_dates, interval 1 day) from temp b where b.player_id = a.player_id)
+),
+## get the date to -1 to be able to join the results
+temp4 as(
+    select player_id, date_add(event_date, interval -1 day) as var2
+    from temp3
+),
+## for each install date find the users who logged in on the next day to play
+temp5 as(
+    select var2, count(player_id) as cnt2
+    from temp4
+    group by var2
+),
+## joining the two tables to get install and next day users for each install day
+temp6 as(
+    select t2.*, coalesce(t5.cnt2, 0) as var2
+    from temp2 t2 left join temp5 t5
+    on t2.install_dates = t5.var2
+),
+## preparing the final ans table
+temp7 as(
+    select install_dates as install_dt, cnt as installs, round(var2/cnt, 2) as Day1_retention
+    from temp6
+)
+
+select * from temp7
