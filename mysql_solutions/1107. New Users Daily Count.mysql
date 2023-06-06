@@ -1,0 +1,40 @@
+# Write your MySQL query statement below
+## select records which are within 90 days
+with temp as(
+    select *
+    from traffic 
+    where datediff('2019-06-30', activity_date) <= 90 and datediff('2019-06-30', activity_date) > 0 and activity = 'login'
+),
+##find min of all users within the current 90 days
+temp1 as(
+    select user_id, min(activity_date) as mins
+    from traffic 
+    where activity = 'login'
+    group by user_id
+),
+## find min all users within the entire table
+temp2 as(
+    select user_id, min(activity_date) as mins
+    from temp
+    group by user_id
+),
+## join the above two tables
+temp3 as(
+    select t2.*, t1.mins as mins2
+    from temp2 t2 left join temp1 t1
+    on t2.user_id = t1.user_id
+),
+## if both the mins do not match then user first logged in before the 90 day limit
+temp4 as(
+    select *
+    from temp3
+    where mins = mins2
+),
+## find count of users who logged in the last 90 days for each day
+temp5 as(
+    select mins as login_date, count(*) as user_count
+    from temp4
+    group by mins
+)
+
+select * from temp5
