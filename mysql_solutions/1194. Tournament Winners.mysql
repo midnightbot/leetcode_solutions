@@ -1,0 +1,40 @@
+# Write your MySQL query statement below
+with temp as(
+    select match_id, first_player as player, first_score as score
+    from matches
+    union all
+    select match_id, second_player as player, second_score as score
+    from matches
+),
+temp1 as(
+    select player, sum(score) as score
+    from temp
+    group by player
+),
+temp2 as(
+    select t1.player, t1.score, p.group_id
+    from temp1 t1 left join players p
+    on t1.player = p.player_id
+),
+temp3 as(
+    select group_id, max(score) as maxs
+    from temp2
+    group by group_id
+),
+temp4 as(
+    select t2.player, t2.score, t2.group_id, t3.maxs
+    from temp2 t2 left join temp3 t3 
+    on t2.group_id = t3.group_id
+),
+temp5 as(
+    select * 
+    from temp4
+    where score = maxs
+),
+temp6 as(
+    select group_id, min(player) as player_id
+    from temp5
+    group by group_id
+)
+
+select * from temp6
