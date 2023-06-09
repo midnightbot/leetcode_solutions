@@ -1,0 +1,25 @@
+# Write your MySQL query statement below
+## original team ranking
+with temp as(
+    select t.*, @a:=@a+1 as team_rank
+    from teampoints t, (select @a:=0) as tmp
+    order by t.points desc, t.name asc
+),
+temp1 as(
+    select t.team_id, t.name, t.points + p.points_change as points
+    from teampoints t left join pointschange p
+    on t.team_id = p.team_id
+    order by points desc, name asc
+),
+## new team rank
+temp2 as(
+    select t1.*, @b:=@b+1 as new_rank
+    from temp1 t1, (select @b:=0) as t
+),
+temp3 as(
+    select t.team_id, t.name, t.team_rank - t2.new_rank as rank_diff
+    from temp t left join temp2 t2
+    on t.team_id = t2.team_id
+)
+
+select * from temp3
