@@ -1,0 +1,35 @@
+# Write your MySQL query statement below
+with temp as(
+    select * 
+    from actions
+    where action = 'report' and extra = 'spam'
+),
+temp1 as(
+    select t.post_id, t.action_date, coalesce(r.remove_date, -1) as remove_date
+    from temp t left join removals r
+    on t.post_id = r.post_id
+),
+temp2 as(
+    select action_date, count(distinct(post_id)) as removals
+    from temp1
+    where remove_date!=-1
+    group by action_date
+),
+temp3 as(
+    select action_date, count(distinct(post_id)) as reports
+    from temp1
+    group by action_date
+),
+temp4 as(
+    select t3.action_date, t3.reports, t2.removals
+    from temp3 t3 left join temp2 t2 
+    on t3.action_date = t2.action_date
+),
+temp5 as(
+    select action_date, coalesce((removals/reports)*100,0) as percent
+    from temp4
+)
+
+#select * from temp5
+select round(avg(percent),2) as average_daily_percent
+from temp5
