@@ -1,0 +1,42 @@
+# Write your MySQL query statement below
+with temp as(
+    select order_id, customer_id, date_format(order_date, "%Y") as yr, price
+    from orders
+),
+## for each user and each year find total purchase price
+temp1 as(
+    select customer_id, yr, sum(price) as total
+    from temp
+    group by customer_id, yr
+    order by customer_id, yr
+),
+## join records for consecutive years to compare if increasing
+temp2 as(
+    select t1.customer_id, t1.yr, t1.total, t2.yr as yr2, t2.total as total2
+    from temp1 t1 join temp1 t2
+    on t1.customer_id = t2.customer_id and t1.yr +1 = t2.yr
+),
+## find number of increasing records for each user
+temp3 as(
+    select customer_id, count(*) as inc_count
+    from temp2
+    where total < total2
+    group by customer_id
+),
+## find number of records for each user
+temp4 as(
+    select customer_id, count(*) - 1 as cnt
+    from temp1
+    group by customer_id
+),
+## number of increasing jumps should be equal to number of records - 1
+## example if a user has records for 2 years then there will be 1 increasing jump
+temp5 as(
+    select t4.*, coalesce(t3.inc_count,0) as inc_count
+    from temp4 t4 left join temp3 t3
+    on t4.customer_id = t3.customer_id
+)
+
+select customer_id
+from temp5
+where cnt = inc_count
