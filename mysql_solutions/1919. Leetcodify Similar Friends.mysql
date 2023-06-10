@@ -1,0 +1,24 @@
+# Write your MySQL query statement below
+with temp as(
+    select a.user_id as user1, a.song_id, a.day, b.user_id as user2
+    from listens a join listens b
+    on a.song_id = b.song_id and a.day = b.day and a.user_id < b.user_id
+),
+temp1 as(
+    select user1, user2, day, count(distinct(song_id)) as cnt
+    from temp
+    group by user1, user2, day
+),
+temp2 as(
+    select user1, user2
+    from temp1
+    where cnt>=3
+),
+temp3 as(
+    select a.user1, a.user2
+    from temp2 a
+    where a.user2 in (select user2_id from friendship where user1_id = a.user1)
+)
+
+select distinct user1 as user1_id, user2 as user2_id
+from temp3
