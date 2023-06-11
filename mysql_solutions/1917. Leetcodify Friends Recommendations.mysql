@@ -1,0 +1,39 @@
+# Write your MySQL query statement below
+## x and y are not friends
+## x and y listened to 3 or more diff songs on the same day
+## join users that hear same song on same day
+with temp as(
+    select a.user_id as u1, a.song_id, a.day, b.user_id as u2
+    from listens a join listens b
+    on a.song_id = b.song_id and a.day = b.day and a.user_id < b.user_id
+),
+## for each user pair and for each day find how many same songs did they listen
+temp1 as(
+    select u1, u2, day, count(distinct(song_id)) as cnt
+    from temp
+    group by u1, u2, day
+),
+## if a pair had 3 or more common songs, find them
+temp2 as(
+    select distinct u1, u2
+    from temp1
+    where cnt >= 3
+),
+## join the above result with friendship table
+temp3 as(
+    select t2.u1, t2.u2, f.user1_id, f.user2_id
+    from temp2 t2 left join friendship f
+    on t2.u1 = f.user1_id and t2.u2 = f.user2_id
+),
+## if a pair had 3 or more common songs and are not friends then they belong to ans
+temp4 as(
+    select u1, u2
+    from temp3
+    where user1_id is null or user2_id is null
+)
+
+select u1 as user_id, u2 as recommended_id
+from temp4
+union all 
+select u2 as user_id, u1 as recommended_id
+from temp4
