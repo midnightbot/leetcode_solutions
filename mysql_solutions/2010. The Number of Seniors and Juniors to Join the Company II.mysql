@@ -1,0 +1,67 @@
+# Write your MySQL query statement below
+## almost same as question 2004
+## just change temp9 (final table to combine the two values)
+with temp as(
+    select c.*, @a:=@a+1 as cnt
+    from candidates c, (select @a:=0) as t
+    where c.experience = 'Senior'
+    order by c.salary asc
+),
+temp1 as(
+    select a.*, b.salary as s2, b.cnt as c2
+    from temp a, temp b
+    where a.cnt >= b.cnt
+),
+temp2 as(
+    select employee_id, cnt, sum(s2) as amount
+    from temp1
+    group by employee_id
+    order by cnt
+),
+## amount used for seniors
+temp3 as(
+    select coalesce(max(amount),0) as maxs
+    from temp2
+    where amount <= 70000
+),
+## number of seniors
+temp4 as(
+    select 'Senior' as experience, count(amount) as accepted_candidates
+    from temp2
+    where amount <= 70000
+),
+## doing similar steps for junior
+temp5 as(
+    select c.*, @b:=@b+1 as cnt
+    from candidates c, (select @b:=0) as t
+    where c.experience = 'Junior'
+    order by c.salary asc
+),
+temp6 as(
+    select a.*, b.salary as s2, b.cnt as c2
+    from temp5 a, temp5 b
+    where a.cnt >= b.cnt
+),
+temp7 as(
+    select employee_id, cnt, sum(s2) as amount
+    from temp6
+    group by employee_id
+    order by cnt
+),
+## amount left to hire junior is 70000 - (amount used for seniors)
+temp8 as(
+    select 'Junior' as experience, count(amount) as accepted_candidates
+    from temp7
+    where amount <= 70000 - (select * from temp3)
+),
+temp9 as(
+    select employee_id
+    from temp 
+    where cnt <= (select accepted_candidates from temp4)
+    union all
+    select employee_id
+    from temp5
+    where cnt <= (select accepted_candidates from temp8)
+)
+
+select * from temp9
