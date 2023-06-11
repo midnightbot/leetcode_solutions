@@ -1,0 +1,63 @@
+# Write your MySQL query statement below
+with temp as(
+    select a.user_id, a.spend_date, a.platform, a.amount, b.platform as p2, b.amount as a2
+    from spending a left join spending b
+    on a.user_id = b.user_id and a.platform!=b.platform and a.spend_date = b.spend_date
+),
+## only mobile users
+temp1 as(
+    select user_id, spend_date, platform, amount
+    from temp
+    where p2 is null and a2 is null and platform = 'mobile'
+),
+## only desktop users
+temp2 as(
+    select user_id, spend_date, platform, amount
+    from temp
+    where p2 is null and a2 is null and platform = 'desktop'
+),
+## both mobile and desktop users
+temp3 as(
+    select user_id, spend_date, platform, amount
+    from temp
+    where p2 is not null
+),
+## find sum and user_count for mobile users
+temp4 as(
+    select spend_date, 'mobile' as platform, sum(amount) as total_amount, count(user_id) as total_users
+    from temp1
+    group by spend_date
+),
+## find sum and user_count for desktop users
+temp5 as(
+        select spend_date, 'desktop' as platform, sum(amount) as total_amount, count(user_id) as total_users
+    from temp2
+    group by spend_date
+),
+## find sum and user_count for both users
+temp6 as(
+    select spend_date, 'both' as platform, sum(amount) as total_amount, count(distinct(user_id)) as total_users
+    from temp3
+    group by spend_date
+),
+## find distinct spend_date to prepare the final ans
+temp7 as(
+    select distinct(spend_date) as spend_date
+    from spending
+),
+## preparing the final result table
+temp8 as(
+    select t7.spend_date, coalesce(t4.platform, 'mobile') as platform, coalesce(t4.total_amount,0) as total_amount, coalesce(t4.total_users, 0) as total_users
+    from temp7 t7 left join temp4 t4 
+    on t7.spend_date = t4.spend_date
+    union all
+    select t7.spend_date, coalesce(t5.platform, 'desktop') as platform, coalesce(t5.total_amount,0) as total_amount, coalesce(t5.total_users, 0) as total_users
+    from temp7 t7 left join temp5 t5 
+    on t7.spend_date = t5.spend_date
+    union all
+    select t7.spend_date, coalesce(t6.platform, 'both') as platform, coalesce(t6.total_amount,0) as total_amount, coalesce(t6.total_users, 0) as total_users
+    from temp7 t7 left join temp6 t6 
+    on t7.spend_date = t6.spend_date
+)
+
+select * from temp8
