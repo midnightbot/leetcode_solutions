@@ -1,0 +1,22 @@
+# Write your MySQL query statement below
+with temp as(
+    select product_id, quantity, date_format(purchase_date, '%Y') as yr
+    from orders
+),
+temp1 as(
+    select product_id, count(*) as cnt, yr
+    from temp
+    group by product_id, yr
+),
+temp2 as(
+    select a.product_id, a.cnt, a.yr as yr1, b.yr as yr2, b.cnt as cnt2
+    from temp1 a join temp1 b
+    on a.product_id = b.product_id and a.yr+1 = b.yr
+),
+temp3 as(
+    select distinct product_id
+    from temp2
+    where cnt>=3 and cnt2>=3
+)
+
+select * from temp3
