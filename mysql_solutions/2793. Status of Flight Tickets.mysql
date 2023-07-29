@@ -1,0 +1,16 @@
+with temp as(
+    select p.passenger_id, p.flight_id, rank() over(partition by p.flight_id order by p.booking_time asc) as counter, f.capacity
+    from passengers p join flights f
+    on p.flight_id = f.flight_id
+),
+temp1 as(
+    select passenger_id, case
+    when counter <= capacity then 'Confirmed'
+    else 'Waitlist'
+    end as Status
+    from temp
+)
+
+select * 
+from temp1
+order by passenger_id asc
