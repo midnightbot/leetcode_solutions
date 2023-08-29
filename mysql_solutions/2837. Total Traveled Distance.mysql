@@ -1,0 +1,15 @@
+# Write your MySQL query statement below
+with temp as(
+  select user_id, sum(distance) as ss
+  from rides
+  group by user_id
+),
+temp1 as(
+  select u.*, coalesce(t.ss,0) as 'traveled distance'
+  from users u left join temp t 
+  on u.user_id = t.user_id
+)
+
+select *
+from temp1
+order by user_id
