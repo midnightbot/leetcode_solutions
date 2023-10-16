@@ -1,0 +1,14 @@
+# Write your MySQL query statement below
+with temp as(select t1.minute, t2.minute as mins, t2.order_count as cnt
+from orders t1, orders t2
+where t2.minute < t1.minute + 6 and t1.minute%6=1 and t2.minute >= t1.minute),
+
+temp2 as(
+  select minute%6 + floor(minute/6) as interval_no, mins, cnt
+  from temp
+)
+
+select interval_no, sum(cnt) as total_orders
+from temp2
+group by interval_no
+order by interval_no asc
