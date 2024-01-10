@@ -1,0 +1,15 @@
+# Write your MySQL query statement below
+with temp as(
+    select city, avg(price) as avgs
+    from listings
+    group by city
+),
+temp2 as(
+    select l.*, t.avgs
+    from listings l left join temp t
+    on l.city = t.city
+)
+
+select distinct(city) from temp2
+where avgs > (select avg(price) from listings)
+order by city asc
