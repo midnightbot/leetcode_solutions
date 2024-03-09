@@ -1,0 +1,15 @@
+# Write your MySQL query statement below
+with temp as(
+    select id, substring_index(email, '@', -1) as email_domain
+    from emails
+),
+temp1 as(
+    select *
+    from temp
+    where substring_index(email_domain, '.', -1) = 'com'
+)
+
+select email_domain, count(*) as count
+from temp1
+group by email_domain
+order by email_domain asc
