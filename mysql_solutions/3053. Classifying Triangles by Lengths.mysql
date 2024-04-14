@@ -1,0 +1,13 @@
+# Write your MySQL query statement below
+with temp as(
+    select 
+    case
+    when a = b and a=c and b=c then 'Equilateral'
+    when a+b>c and a+c>b and b+c>a and ((a=b and a!=c) or (a=c and b!=c) or (b=c and a!=c)) then 'Isosceles'
+    when a+b>c and a+c>b and b+c>a and a!=b and b!=c and a!=c then 'Scalene'
+    else 'Not A Triangle'
+    end as triangle_type
+    from triangles
+)
+
+select * from temp
