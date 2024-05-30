@@ -1,0 +1,7 @@
+# Write your MySQL query statement below
+select tweet_id
+from tweets
+where char_length(content) > 140 or 
+LENGTH(content)- LENGTH(REPLACE(content, '@', '')) > 3 or 
+LENGTH(content)- LENGTH(REPLACE(content, '#', '')) > 3 
+order by tweet_id asc
