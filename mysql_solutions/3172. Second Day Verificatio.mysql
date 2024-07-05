@@ -1,0 +1,11 @@
+# Write your MySQL query statement below
+with temp as(
+    select e.email_id, e.user_id, e.signup_date, t.text_id, t.action_date, datediff(t.action_date, e.signup_date) as diff
+    from emails e join texts t
+    on e.email_id = t.email_id and t.signup_action='Verified'
+)
+
+select user_id 
+from temp
+where diff=1
+order by user_id asc
