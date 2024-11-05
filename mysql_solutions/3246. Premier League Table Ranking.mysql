@@ -1,0 +1,12 @@
+# Write your MySQL query statement below
+with temp as (
+    select team_id, team_name, 3*wins+1*draws as points
+    from TeamStats
+),
+temp1 as (
+    select team_id, team_name, points, rank() over(order by points desc) as position
+    from temp
+    order by points desc, team_name asc
+)
+
+select * from temp1
