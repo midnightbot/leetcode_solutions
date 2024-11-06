@@ -1,0 +1,11 @@
+# Write your MySQL query statement below
+with temp as(
+    select emp_id, salary, dept, dense_rank() over (partition by dept order by salary desc) as ranks
+    from employees
+)
+
+-- select * from temp
+select emp_id, dept
+from temp
+where ranks=2
+order by emp_id asc
