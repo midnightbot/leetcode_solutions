@@ -1,0 +1,11 @@
+# Write your MySQL query statement below
+with temp as(
+    select student_id, (assignment1+assignment2+assignment3) as marks
+    from scores
+),
+temp1 as (
+    select max(marks)-min(marks) as difference_in_score
+    from temp
+)
+
+select * from temp1
