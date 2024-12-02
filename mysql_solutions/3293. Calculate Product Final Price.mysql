@@ -1,0 +1,11 @@
+# Write your MySQL query statement below
+with temp as(
+    select p.product_id, p.category, p.price, COALESCE(d.discount, 0) as discount
+    from products p left join discounts d
+    on p.category = d.category
+),
+temp1 as(
+    select product_id, price * (100-discount)/100 as final_price, category
+    from temp
+)
+select * from temp1
