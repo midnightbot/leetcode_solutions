@@ -1,0 +1,59 @@
+# Write your MySQL query statement below
+with temp as (
+    select book_id, count(*) as cnt
+    from reading_sessions
+    group by book_id
+),
+temp1 as (
+    select *
+    from temp
+    where cnt>=5
+),
+temp2 as (
+    select book_id, session_rating, count(*) as cnt
+    from reading_sessions
+    where book_id in (select book_id from temp1)
+    group by book_id, session_rating
+),
+temp3 as (
+    select book_id, GROUP_CONCAT(distinct(session_rating)) as rts
+    from temp2
+    group by book_id
+),
+temp4 as (
+    select book_id
+    from temp3
+    where (FIND_IN_SET('1', rts) OR FIND_IN_SET('2', rts))
+        AND (FIND_IN_SET('4', rts) OR FIND_IN_SET('5', rts))
+),
+temp5 as (
+    select book_id, max(session_rating) - min(session_rating) as rating_spread
+    from reading_sessions
+    where book_id in (select * from temp4)
+    group by book_id
+),
+temp6 as (
+    select book_id, count(*) as min_rating_cnt
+    from reading_sessions
+    where book_id in (select * from temp4) and session_rating <= 2
+    group by book_id
+),
+temp7 as (
+    select book_id, count(*) as max_rating_cnt
+    from reading_sessions
+    where book_id in (select * from temp4) and session_rating >= 4
+    group by book_id
+),
+temp8 as(
+    select temp6.book_id, round((min_rating_cnt + max_rating_cnt)/temp.cnt,2) as polarization_score
+    from temp6 join temp7 on temp6.book_id = temp7.book_id
+    join temp on temp7.book_id = temp.book_id
+),
+temp9 as (
+    select temp5.book_id, temp5.rating_spread, temp8.polarization_score
+    from temp5 join temp8 on temp5.book_id = temp8.book_id
+)
+select b.book_id, b.title, b.author, b.genre, b.pages, t9.rating_spread, t9.polarization_score
+from temp9 t9 inner join books b
+on t9.book_id = b.book_id
+order by t9.polarization_score desc, b.title desc
